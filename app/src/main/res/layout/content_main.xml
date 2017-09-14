@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/content_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.ms.favtodo.activity.MainActivity"
+    android:background="@color/colorGrey200"
+
+    android:focusableInTouchMode="true"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/footer"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        >
+
+        <EditText
+            android:theme="@style/EditTextStyle"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="7"
+            android:id="@+id/quick_task"
+            android:hint="@string/quick_task_hint"
+            android:padding="@dimen/footer_margin"
+            android:maxLines="1"
+            android:textColor="@color/colorWhite"
+            />
+
+        <ImageButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:id="@+id/tick_btn"
+            android:background="@drawable/ic_done_white_24dp"
+           />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_above="@id/footer"
+        android:id="@+id/shadow"
+        android:background="@drawable/shadow"
+       />
+
+    <LinearLayout
+        android:id="@+id/toDoEmptyView"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+       <!-- <ImageView
+            android:src="@drawable/empty_view_bg"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />-->
+        <TextView
+            android:text="@string/no_tasks_todo"
+            android:textColor="@color/secondary_text"
+            android:textSize="16sp"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/no_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:text="@string/no_finished_tasks"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:visibility="gone"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/shadow"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ListView
+            android:id="@+id/todo_lists"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="@dimen/divider_margin"
+            android:paddingLeft="@dimen/listView_margin_horizontal"
+            android:paddingRight="@dimen/listView_margin_horizontal"
+            android:paddingTop="@dimen/listView_padding"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+       <android.support.design.widget.FloatingActionButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:clickable="true"
+           app:fabSize="normal"
+           app:srcCompat="@android:drawable/ic_input_add"
+           android:id="@+id/fab"
+           android:tint="@android:color/white"
+           app:backgroundTint="@color/floating_btn"
+           android:layout_above="@+id/footer"
+           android:layout_alignParentEnd="true"
+           android:layout_marginBottom="@dimen/activity_vertical_margin"
+           android:layout_marginEnd="@dimen/activity_vertical_margin"
+           />
+
+</RelativeLayout>
