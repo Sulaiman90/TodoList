@@ -46,7 +46,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                    .setContentTitle(TaskTitle+" "+rowId)
+                    .setContentTitle(TaskTitle)
                     .setContentText(rowId+"")
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(TaskTitle))
                     .setSmallIcon(R.drawable.ic_done_white_24dp)
@@ -114,7 +114,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 launchIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         Action taskDoneAction = new Action(R.drawable.ic_done_white_24dp,
-                "I did it",
+                context.getResources().getString(R.string.task_done_remainder),
                 pendingIntent);
         return taskDoneAction;
     }
@@ -128,7 +128,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 ignoreReminderIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         Action ignoreReminderAction = new Action(R.drawable.ic_cancel_black_24px,
-                "No thanks",
+                context.getResources().getString(R.string.ignore_remainder),
                 pendingIntent);
         return ignoreReminderAction;
     }

@@ -70,6 +70,8 @@ public class NewTask extends AppCompatActivity {
     private static String timeText;
     private int taskId = 0;
 
+    private static Calendar mCalendar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +83,8 @@ public class NewTask extends AppCompatActivity {
         dbHelper = new TaskDbHelper(this);
 
         taskOperation = new TaskOperation(this);
+
+        mCalendar = Calendar.getInstance();
 
         mTitleText = (EditText) findViewById(R.id.title);
         mDateText = (EditText) findViewById(R.id.dateText);
@@ -291,11 +295,27 @@ public class NewTask extends AppCompatActivity {
             values.put(TaskEntry.TASK_HOUR, taskHour);
             values.put(TaskEntry.TASK_MINUTE, taskMinute);
 
+            long rowId = taskId;
             if (newTask) {
-                dbHelper.insertTask(values);
+                rowId = dbHelper.insertTask(values);
             } else {
                 dbHelper.updateTask(taskId, values);
             }
+
+            //TaskOperation.showDebugToast(this,dateText);
+
+            if (!dateText.matches("") && (!taskOperation.isPassed(dateInMillis,taskHour,taskMinute) )) {
+                if (newTask) {
+                    TaskOperation.scheduleReminder(mCalendar,this,rowId,todoTitle);
+                }
+                else{
+                    TaskOperation.cancelReminder(this,taskId);
+                    if(todoFinished==0){
+                        TaskOperation.scheduleReminder(mCalendar,this,taskId,todoTitle);
+                    }
+                }
+            }
+
             db.close();
 
             Intent intent = new Intent();
@@ -364,7 +384,7 @@ public class NewTask extends AppCompatActivity {
         }
         if(!mTaskDone.isChecked()) {
             if (taskOperation.isDatePassed(date)) {
-                Log.d(TAG,"isDatePassed ");
+               // Log.d(TAG,"isDatePassed ");
                 mDateText.setTextColor(ContextCompat.getColor(mDateText.getContext(), R.color.red));
                 mTimeText.setTextColor(ContextCompat.getColor(mTimeText.getContext(), R.color.red));
             } else {
@@ -400,11 +420,6 @@ public class NewTask extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
-
-    private static void showDebugToast(String msg){
-        Toast.makeText(mTimeText.getContext(),msg,Toast.LENGTH_LONG).show();
-    }
-
     // DialogFragment used to pick a ToDoItem deadline date
 
     public static class DatePickerFragment extends DialogFragment implements
@@ -437,6 +452,10 @@ public class NewTask extends AppCompatActivity {
                               int selectedDay) {
 
             Calendar cal = Calendar.getInstance();
+
+            mCalendar.set(Calendar.YEAR, selectedYear);
+            mCalendar.set(Calendar.MONTH, selectedMonth);
+            mCalendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
             cal.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
             cal.set(Calendar.MONTH, datePicker.getMonth());
@@ -491,8 +510,8 @@ public class NewTask extends AppCompatActivity {
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
-            Log.d(TAG," mTimeText "+hour);
-            showDebugToast(String.valueOf(hour));
+           // Log.d(TAG," mTimeText "+hour);
+          //  showDebugToast(String.valueOf(hour));
             if(TextUtils.isEmpty(mTimeText.getText().toString())){
                 minute = 0;
                 if(DateUtils.isToday(dateInMillis)){
@@ -518,6 +537,11 @@ public class NewTask extends AppCompatActivity {
         }
 
         public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
+
+            mCalendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+            mCalendar.set(Calendar.MINUTE, selectedMinute);
+
+            //dateInMillis = mCalendar.getTimeInMillis();
 
             int hour = selectedHour;
             int minutes = selectedMinute;

@@ -1,6 +1,9 @@
 package com.ms.favtodo.utils;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +18,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.activity.NewTask;
@@ -23,6 +27,7 @@ import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.adapter.CustomListAdapter;
 import com.ms.favtodo.model.TaskDetails;
+import com.ms.favtodo.receiver.AlarmReceiver;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -423,7 +428,40 @@ public class TaskOperation {
         }
     }
 
+    public static void scheduleReminder(Calendar when,Context context,long taskId,String title){
 
+        showDebugToast(context,"scheduleReminder");
+        Log.d(TAG,"scheduleReminder");
 
+        AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent i = new Intent(context, AlarmReceiver.class);
+        i.putExtra("TaskTitle", title);
+        i.putExtra("TaskRowId", taskId);
+
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_ONE_SHOT);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
+    }
+
+    public static void cancelReminder(Context context,long taskId){
+        AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(context, AlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        pi.cancel();
+        mAlarmManager.cancel(pi);
+        cancelNotification(context,taskId);
+    }
+
+    public static void cancelNotification(Context context,long notificationId){
+        NotificationManager notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        /*  REMINDER_NOTIFICATION_ID allows you to update or cancel the notification later on */
+        notificationManager.cancel((int)notificationId);
+    }
+
+    public static void showDebugToast(Context context,String msg){
+        Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
+    }
 
 }

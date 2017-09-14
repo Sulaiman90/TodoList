@@ -62,6 +62,24 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor fetchTask(long rowId){
+        String[] columns = new String[] { TaskEntry.TASK_ID, TaskEntry.TASK_TITLE, TaskEntry.TASK_DATE,
+                TaskEntry.TASK_TIME,TaskEntry.TASK_DATE_AND_TIME , TaskEntry.TASK_DONE,
+                TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
+        Cursor cursor = this.getReadableDatabase().query(TaskEntry.TABLE_NAME,
+                columns,
+                TaskEntry.TASK_ID + "=?",
+                new String[] {String.valueOf(rowId)},
+                null,
+                null,
+                null,
+                null);
+        if (cursor!=null){
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
      public int updateTaskStatus(String taskTitle,ContentValues cv) {
        SQLiteDatabase db = this.getWritableDatabase();
 
@@ -107,13 +125,14 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public void insertTask(ContentValues values){
+    public long insertTask(ContentValues values){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.insert(TaskEntry.TABLE_NAME,null,values);
+        long rowId = db.insert(TaskEntry.TABLE_NAME,null,values);
         db.close();
+        return rowId;
     }
 
-    public void insertTask(String title,String date,String time,String dateAndTime,int done,long dateInMs , int hour, int minute){
+    public long insertTask(String title,String date,String time,String dateAndTime,int done,long dateInMs , int hour, int minute){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values =  new ContentValues();
@@ -126,8 +145,9 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         values.put(TaskEntry.TASK_HOUR,hour);
         values.put(TaskEntry.TASK_MINUTE,minute);
 
-        db.insert(TaskEntry.TABLE_NAME,null,values);
+        long rowId = db.insert(TaskEntry.TABLE_NAME,null,values);
         db.close();
+        return rowId;
     }
 
     public int rowcount()

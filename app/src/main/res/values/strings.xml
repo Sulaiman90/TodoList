@@ -35,6 +35,9 @@
     <string name="no_alert">No</string>
     <string name="yes_alert">Yes</string>
 
+    <string name="ignore_remainder">Ignore</string>
+    <string name="task_done_remainder">Task Done</string>
+
     <string-array name="spinner_list_items">
         <item>All Tasks</item>
         <item>Completed</item>
