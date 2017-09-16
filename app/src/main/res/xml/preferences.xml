@@ -4,13 +4,16 @@
  <PreferenceCategory android:title="@string/notification_preference">
 
      <Preference
-         android:key="alarm_time"
+         android:key="@string/pref_due_time_key"
          android:title="Default reminder"
          android:defaultValue="18:00"
-         android:summary="Notifications for tasks without due times will appear at 6 PM"/>
+         android:summary="Notifications for tasks without due times will appear at 6 PM "/>
 
     </PreferenceCategory>
 
 
 
 </PreferenceScreen>
+
+
+   <!-- android:summary="Notifications for tasks without due times will appear at 6 PM "-->

@@ -9,6 +9,7 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.fragment.AlertDialogFragment;
+import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
@@ -457,8 +459,8 @@ public class NewTask extends AppCompatActivity {
             mCalendar.set(Calendar.MONTH, selectedMonth);
             mCalendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-            mCalendar.set(Calendar.HOUR_OF_DAY, 12);
-            mCalendar.set(Calendar.MINUTE, 48);
+            mCalendar.set(Calendar.HOUR_OF_DAY, PreferenceUtils.getHour(getActivity()));
+            mCalendar.set(Calendar.MINUTE, PreferenceUtils.getMinute(getActivity()));
 
             cal.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
             cal.set(Calendar.MONTH, datePicker.getMonth());

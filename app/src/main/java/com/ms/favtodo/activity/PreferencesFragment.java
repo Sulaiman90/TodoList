@@ -5,10 +5,13 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -16,6 +19,7 @@ import android.widget.TimePicker;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.activity.NewTask.TimePickerFragment;
+import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.util.Calendar;
@@ -26,12 +30,21 @@ import java.util.Calendar;
 
 public class PreferencesFragment  extends PreferenceFragmentCompat {
 
+    private static Preference prefDueTime;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
 
-        Preference btnDateFilter = findPreference("alarm_time");
-        btnDateFilter.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        Context context = getActivity();
+
+        String timeString = PreferenceUtils.getDueTime12HrFormat(context);
+
+        prefDueTime = findPreference(getString(R.string.pref_due_time_key));
+
+        prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
+
+        prefDueTime.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB)
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -39,7 +52,6 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
                 return false;
             }
         });
-
     }
 
     public void showTimePickerDialog() {
@@ -54,8 +66,8 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current time as the default values for the picker
-            int hour = 12;
-            int minute = 0;
+            int hour = PreferenceUtils.getHour(getActivity());
+            int minute = PreferenceUtils.getMinute(getActivity());
 
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute, false);
@@ -85,10 +97,21 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
             else
                 min = String.valueOf(minutes);
 
-            String timeString = hour +":"+min +" "+timeSet;
+            String timeString;
 
-           // TaskOperation.showDebugToast(getActivity(),selectedHour+""+selectedMinute);
+            if(minutes!=0){
+                timeString = hour +":"+min +" "+timeSet;
+            }
+            else{
+                timeString = hour +" "+timeSet;
+            }
+
             TaskOperation.showDebugToast(getActivity(),timeString);
+            prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
+
+            PreferenceUtils.updateDueTimeValue(getActivity(),timeString,selectedHour + ":"+ selectedMinute);
         }
     }
+
+
 }

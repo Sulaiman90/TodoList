@@ -192,6 +192,7 @@ public class CustomListAdapter extends BaseAdapter{
                             values.put(TaskEntry.TASK_DONE, 0);
                         }
                         dbHelper.updateTask(taskDetails.getTaskId(), values);
+                        TaskOperation.cancelReminder(mContext,taskDetails.getTaskId());
                         View v1 = (View) v.getParent();
                         removeListItem(v1,position);
                     }
