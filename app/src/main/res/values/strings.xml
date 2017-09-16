@@ -37,10 +37,15 @@
 
     <string name="ignore_remainder">Ignore</string>
     <string name="task_done_remainder">Task Done</string>
+    <string name="action_settings">Settings</string>
 
     <string-array name="spinner_list_items">
         <item>All Tasks</item>
         <item>Completed</item>
     </string-array>
+
+    <!-- Strings related to Settings -->
+    <string name="notification_preference">Notifications</string>
+
 </resources>
 

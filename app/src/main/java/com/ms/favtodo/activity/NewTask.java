@@ -76,8 +76,8 @@ public class NewTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dbHelper = new TaskDbHelper(this);
@@ -456,6 +456,9 @@ public class NewTask extends AppCompatActivity {
             mCalendar.set(Calendar.YEAR, selectedYear);
             mCalendar.set(Calendar.MONTH, selectedMonth);
             mCalendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+
+            mCalendar.set(Calendar.HOUR_OF_DAY, 12);
+            mCalendar.set(Calendar.MINUTE, 48);
 
             cal.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
             cal.set(Calendar.MONTH, datePicker.getMonth());
