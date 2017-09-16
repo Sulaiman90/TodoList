@@ -38,6 +38,7 @@ import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.fragment.AlertDialogFragment;
 import com.ms.favtodo.utils.PreferenceUtils;
+import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
@@ -78,9 +79,7 @@ public class NewTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
-       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dbHelper = new TaskDbHelper(this);
 
@@ -256,10 +255,10 @@ public class NewTask extends AppCompatActivity {
 
     private void saveTodo() {
         String todoTitle = mTitleText.getText().toString().trim();
-        String todoDate = "";
-        String todoTime = "";
-        String todoDateAndTime = "";
-        int todoFinished = 0;
+        String todoDate;
+        String todoTime;
+        String todoDateAndTime;
+        int todoFinished;
 
         //Log.d(TAG,"time "+todoTitle);
         if (!TextUtils.isEmpty(todoTitle)) {
@@ -306,14 +305,14 @@ public class NewTask extends AppCompatActivity {
 
             //TaskOperation.showDebugToast(this,dateText);
 
-            if (!dateText.matches("") && (!taskOperation.isPassed(dateInMillis,taskHour,taskMinute) )) {
+            if (!dateText.matches("") && mCalendar.getTimeInMillis() > System.currentTimeMillis()) {
                 if (newTask) {
-                    TaskOperation.scheduleReminder(mCalendar,this,rowId,todoTitle);
+                    ReminderManager.scheduleReminder(mCalendar,this,rowId,todoTitle);
                 }
                 else{
-                    TaskOperation.cancelReminder(this,taskId);
+                    ReminderManager.cancelReminder(this,taskId);
                     if(todoFinished==0){
-                        TaskOperation.scheduleReminder(mCalendar,this,taskId,todoTitle);
+                        ReminderManager.scheduleReminder(mCalendar,this,taskId,todoTitle);
                     }
                 }
             }
@@ -379,7 +378,7 @@ public class NewTask extends AppCompatActivity {
 
     public static void checkIfDatePassed(long date, String dateString) {
         String result = taskOperation.checkDates(dateInMillis);
-        if (result == "") {
+        if (result.equals("")) {
             mDateText.setText(dateString);
         } else {
             mDateText.setText(result);
@@ -481,8 +480,7 @@ public class NewTask extends AppCompatActivity {
 
             dateInMillis = cal.getTimeInMillis();
 
-            String dateString = setDateString(selectedYear, monthName, selectedDay, dayName);
-            dateText = dateString;
+            dateText = setDateString(selectedYear, monthName, selectedDay, dayName);
 
             checkIfDatePassed(dateInMillis,dateText);
 
@@ -513,7 +511,7 @@ public class NewTask extends AppCompatActivity {
             // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            int minute;
 
            // Log.d(TAG," mTimeText "+hour);
           //  showDebugToast(String.valueOf(hour));
@@ -550,7 +548,7 @@ public class NewTask extends AppCompatActivity {
 
             int hour = selectedHour;
             int minutes = selectedMinute;
-            String timeSet = "";
+            String timeSet;
             if (hour > 12) {
                 hour -= 12;
                 timeSet = "PM";
@@ -563,7 +561,7 @@ public class NewTask extends AppCompatActivity {
                 timeSet = "AM";
             }
 
-            String min = "";
+            String min;
             if (minutes < 10)
                 min = "0" + minutes ;
             else

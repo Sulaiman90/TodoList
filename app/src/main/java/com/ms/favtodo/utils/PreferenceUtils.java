@@ -6,22 +6,16 @@ import android.preference.PreferenceManager;
 
 import com.ms.favtodo.R;
 
-/**
- * Created by MOHAMED SULAIMAN on 16-09-2017.
- */
-
 public class PreferenceUtils {
 
     public static String getDueTime12HrFormat(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        String dueTime = sharedPref.getString(context.getString(R.string.pref_due_time_12_hr),"6 PM");
-        return dueTime;
+        return sharedPref.getString(context.getString(R.string.pref_due_time_12_hr),"6 PM");
     }
 
-    public static String getDueTimeHourAndMin(Context context){
+    private static String getDueTimeHourAndMin(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        String dueTime = sharedPref.getString(context.getString(R.string.pref_due_hour_minute),"18:0");
-        return dueTime;
+        return sharedPref.getString(context.getString(R.string.pref_due_hour_minute),"18:0");
     }
 
     public static void updateDueTimeValue(Context context, String dueTime,String hourAndMin){
@@ -29,7 +23,9 @@ public class PreferenceUtils {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(context.getString(R.string.pref_due_time_12_hr), dueTime);
         editor.putString(context.getString(R.string.pref_due_hour_minute),hourAndMin );
-        editor.commit();
+        editor.apply();
+
+        ReminderManager.rescheduleAlarm(context);
     }
 
     public static int getHour(Context context){

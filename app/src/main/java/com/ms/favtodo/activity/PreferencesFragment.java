@@ -24,10 +24,6 @@ import com.ms.favtodo.utils.TaskOperation;
 
 import java.util.Calendar;
 
-/**
- * Created by MOHAMED SULAIMAN on 16-09-2017.
- */
-
 public class PreferencesFragment  extends PreferenceFragmentCompat {
 
     private static Preference prefDueTime;
@@ -91,7 +87,7 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
                 timeSet = "AM";
             }
 
-            String min = "";
+            String min;
             if (minutes < 10)
                 min = "0" + minutes ;
             else
@@ -107,9 +103,12 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
             }
 
             TaskOperation.showDebugToast(getActivity(),timeString);
-            prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
 
-            PreferenceUtils.updateDueTimeValue(getActivity(),timeString,selectedHour + ":"+ selectedMinute);
+            if(!timeString.equals(PreferenceUtils.getDueTime12HrFormat(getActivity()))){
+                prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
+                PreferenceUtils.updateDueTimeValue(getActivity(),timeString,selectedHour + ":"+ selectedMinute);
+            }
+
         }
     }
 

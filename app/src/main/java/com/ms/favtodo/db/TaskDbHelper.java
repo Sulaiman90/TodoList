@@ -10,9 +10,8 @@ import android.util.Log;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.model.TaskDetails;
 
-/**
- * Created by MOHAMED SULAIMAN on 22-12-2016.
- */
+import java.util.Calendar;
+
 
 public class TaskDbHelper extends SQLiteOpenHelper {
 
@@ -49,13 +48,14 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         String[] columns = new String[] { TaskEntry.TASK_ID, TaskEntry.TASK_TITLE, TaskEntry.TASK_DATE,
                                          TaskEntry.TASK_TIME,TaskEntry.TASK_DATE_AND_TIME , TaskEntry.TASK_DONE,
                                          TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
-        Cursor cursor = this.getReadableDatabase().query(TaskEntry.TABLE_NAME,
-                            columns,
-                            TaskEntry.TASK_DONE + "=?",
-                            new String[] {String.valueOf(doneOrNot)},
-                            null,null,
-                            TaskEntry.TASK_ID+" DESC",
-                            null);
+        Cursor cursor = this.getReadableDatabase().query(
+                    TaskEntry.TABLE_NAME,
+                    columns,
+                    TaskEntry.TASK_DONE + "=?",
+                    new String[] {String.valueOf(doneOrNot)},
+                    null,null,
+                    TaskEntry.TASK_ID+" DESC",
+                    null);
         if (cursor!=null){
             cursor.moveToFirst();
         }
@@ -66,10 +66,33 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         String[] columns = new String[] { TaskEntry.TASK_ID, TaskEntry.TASK_TITLE, TaskEntry.TASK_DATE,
                 TaskEntry.TASK_TIME,TaskEntry.TASK_DATE_AND_TIME , TaskEntry.TASK_DONE,
                 TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
-        Cursor cursor = this.getReadableDatabase().query(TaskEntry.TABLE_NAME,
+        Cursor cursor = this.getReadableDatabase().query(
+                TaskEntry.TABLE_NAME,
                 columns,
                 TaskEntry.TASK_ID + "=?",
                 new String[] {String.valueOf(rowId)},
+                null,
+                null,
+                null,
+                null);
+        if (cursor!=null){
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
+    public Cursor fetchTasksWithoutDueTime(){
+
+      //  long timeNow = loc.getTimeInMillis();
+
+        String empty = "";
+        Cursor cursor = this.getReadableDatabase().query(
+                TaskEntry.TABLE_NAME,
+                null,
+                TaskEntry.TASK_DONE + "=?"
+                        + " AND " + TaskEntry.TASK_HOUR + "=?"
+                        + " AND " + TaskEntry.TASK_DATE + "!=?" ,
+                new String[] {String.valueOf(0),String.valueOf(-1),empty},
                 null,
                 null,
                 null,
@@ -152,7 +175,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     public int rowcount()
     {
-        int row=0;
+        int row;
         String selectQuery = "SELECT  * FROM " + TaskEntry.TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);

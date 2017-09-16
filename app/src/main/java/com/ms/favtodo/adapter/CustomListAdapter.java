@@ -18,14 +18,11 @@ import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.model.TaskDetails;
+import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
-
-/**
- * Created by MOHAMED SULAIMAN on 05-01-2017.
- */
 
 public class CustomListAdapter extends BaseAdapter{
 
@@ -38,13 +35,13 @@ public class CustomListAdapter extends BaseAdapter{
 
     private static final int TYPE_TASK = 0;
     private static final int TYPE_HEADER = 1;
-    private TreeSet<Integer> sectionHeader = new TreeSet<Integer>();
+    private TreeSet<Integer> sectionHeader = new TreeSet<>();
 
     private LayoutInflater inflater;
     private Context mContext;
     private TaskDetails taskDetails;
 
-    private static final String TAG = "FavDo_Cus";
+    private static final String TAG = "CustomListAdapter";
 
 
     public CustomListAdapter(Context context, ArrayList<TaskDetails> list,Boolean completedOnly){
@@ -142,7 +139,7 @@ public class CustomListAdapter extends BaseAdapter{
 
                //  Log.d(TAG,"Task Title "+taskDetails.getTitle() +" hour "+taskDetails.getTaskHour() + " minute "+taskDetails.getTaskMinute());
 
-                if (result != "") {
+                if (result.equals("")) {
                     viewHolder.tvdateTime.setVisibility(View.VISIBLE);
                     if(!time.matches("")){
                         result = result + ", " + time;
@@ -192,7 +189,7 @@ public class CustomListAdapter extends BaseAdapter{
                             values.put(TaskEntry.TASK_DONE, 0);
                         }
                         dbHelper.updateTask(taskDetails.getTaskId(), values);
-                        TaskOperation.cancelReminder(mContext,taskDetails.getTaskId());
+                        ReminderManager.cancelReminder(mContext,taskDetails.getTaskId());
                         View v1 = (View) v.getParent();
                         removeListItem(v1,position);
                     }
@@ -220,7 +217,7 @@ public class CustomListAdapter extends BaseAdapter{
         return convertView;
     }
 
-    protected void removeListItem(View rowView, final int position) {
+    private void removeListItem(View rowView, final int position) {
         // TODO Auto-generated method stub
        // Log.d(TAG,"removeListItem");
         final Animation animation = AnimationUtils.loadAnimation(rowView.getContext(), R.anim.slide_out);
@@ -239,7 +236,7 @@ public class CustomListAdapter extends BaseAdapter{
     }
 
 
-    static class ViewHolder{
+    private static class ViewHolder{
         TextView tvTitle;
         TextView tvdateTime;
         CheckBox checkBox;

@@ -32,10 +32,6 @@ import com.ms.favtodo.receiver.AlarmReceiver;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by MOHAMED SULAIMAN on 14-01-2017.
- */
-
 public class TaskOperation {
 
     private TaskDbHelper dbHelper;
@@ -283,7 +279,24 @@ public class TaskOperation {
         return false;
     }
 
-    public static boolean isYesterday(long date) {
+    public static boolean isTimePassed(int hour,int minute){
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+        if(hour>=0 && minute>=0){
+            if(hour < currentHour){
+                return true;
+            }
+            else if(hour == currentHour){
+                if(minute <= currentMinute){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isYesterday(long date) {
         Calendar now = Calendar.getInstance();
         Calendar cdate = Calendar.getInstance();
         cdate.setTimeInMillis(date);
@@ -295,7 +308,7 @@ public class TaskOperation {
                 && now.get(Calendar.DATE) == cdate.get(Calendar.DATE);
     }
 
-    public static boolean isTomorrow(long date) {
+    private static boolean isTomorrow(long date) {
         Calendar now = Calendar.getInstance();
         Calendar cdate = Calendar.getInstance();
         cdate.setTimeInMillis(date);
@@ -307,7 +320,7 @@ public class TaskOperation {
                 && now.get(Calendar.DATE) == cdate.get(Calendar.DATE);
     }
 
-    public static boolean checkIfThisWeek(long date){
+    private static boolean checkIfThisWeek(long date){
         Calendar cal1 = Calendar.getInstance();
         cal1.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         int year1 = cal1.get(Calendar.YEAR);
@@ -319,14 +332,14 @@ public class TaskOperation {
         int year2 = cal2.get(Calendar.YEAR);
         int week2 = cal2.get(Calendar.WEEK_OF_YEAR);
 
-        if(year1 == year2 && week2 == week1){
+        if((year1 == year2) && (week2 == week1)){
            // Log.d(TAG,"This week ");
             return true;
         }
         return false;
     }
 
-    public static boolean checkIfNextWeek(long date){
+    private static boolean checkIfNextWeek(long date){
         Calendar cal1 = Calendar.getInstance();
         cal1.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         int year1 = cal1.get(Calendar.YEAR);
@@ -338,14 +351,14 @@ public class TaskOperation {
         int year2 = cal2.get(Calendar.YEAR);
         int week2 = cal2.get(Calendar.WEEK_OF_YEAR);
 
-        if(year1 == year2 && week2 > week1 && week2-week1 == 1){
+        if(year1 == year2 && (week2 > week1) && (week2-week1 == 1)){
           // Log.d(TAG,"Next week ");
             return true;
         }
         return false;
     }
 
-    public static boolean checkIfThisMonth(long date){
+    private static boolean checkIfThisMonth(long date){
         Calendar cal1 = Calendar.getInstance();
         int year1 = cal1.get(Calendar.YEAR);
         int month1 = cal1.get(Calendar.MONTH) +1 ;
@@ -362,7 +375,7 @@ public class TaskOperation {
         return false;
     }
 
-    public static boolean checkIfNextMonth(long date){
+    private static boolean checkIfNextMonth(long date){
         Calendar cal1 = Calendar.getInstance();
         int year1 = cal1.get(Calendar.YEAR);
         int month1 = cal1.get(Calendar.MONTH) +1 ;
@@ -380,7 +393,7 @@ public class TaskOperation {
         return false;
     }
 
-    public static boolean checkIfLater(long date){
+    private static boolean checkIfLater(long date){
         Calendar cal1 = Calendar.getInstance();
         int year1 = cal1.get(Calendar.YEAR);
         int month1 = cal1.get(Calendar.MONTH) +1 ;
@@ -402,22 +415,6 @@ public class TaskOperation {
         return false;
     }
 
-    public static boolean isTimePassed(int hour,int minute){
-        Calendar now = Calendar.getInstance();
-        int currentHour = now.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = now.get(Calendar.MINUTE);
-        if(hour>=0 && minute>=0){
-            if(hour < currentHour){
-                return true;
-            }
-            else if(hour == currentHour){
-                if(minute <= currentMinute){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     public static void hideKeyboard(@NonNull Activity activity) {
         // Check if no view has focus:
@@ -426,38 +423,6 @@ public class TaskOperation {
             InputMethodManager inputManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
-    }
-
-    public static void scheduleReminder(Calendar when,Context context,long taskId,String title){
-
-        showDebugToast(context,"scheduleReminder");
-        Log.d(TAG,"scheduleReminder");
-
-        AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-
-        Intent i = new Intent(context, AlarmReceiver.class);
-        i.putExtra("TaskTitle", title);
-        i.putExtra("TaskRowId", taskId);
-
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_ONE_SHOT);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
-    }
-
-    public static void cancelReminder(Context context,long taskId){
-        AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        pi.cancel();
-        mAlarmManager.cancel(pi);
-        cancelNotification(context,taskId);
-    }
-
-    public static void cancelNotification(Context context,long notificationId){
-        NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        /*  REMINDER_NOTIFICATION_ID allows you to update or cancel the notification later on */
-        notificationManager.cancel((int)notificationId);
     }
 
     public static void showDebugToast(Context context,String msg){
