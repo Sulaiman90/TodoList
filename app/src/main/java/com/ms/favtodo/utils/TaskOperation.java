@@ -1,9 +1,6 @@
 package com.ms.favtodo.utils;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,7 +24,7 @@ import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.adapter.CustomListAdapter;
 import com.ms.favtodo.model.TaskDetails;
-import com.ms.favtodo.receiver.AlarmReceiver;
+
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +48,7 @@ public class TaskOperation {
         taskList.clear();
 
         ArrayList finalTaskList = new ArrayList();
-        taskList.clear();
+        finalTaskList.clear();
 
         ArrayList<TaskDetails>  overdueTasks = new ArrayList<>();
         overdueTasks.clear();

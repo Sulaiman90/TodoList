@@ -139,7 +139,7 @@ public class CustomListAdapter extends BaseAdapter{
 
                //  Log.d(TAG,"Task Title "+taskDetails.getTitle() +" hour "+taskDetails.getTaskHour() + " minute "+taskDetails.getTaskMinute());
 
-                if (result.equals("")) {
+                if (!result.equals("")) {
                     viewHolder.tvdateTime.setVisibility(View.VISIBLE);
                     if(!time.matches("")){
                         result = result + ", " + time;

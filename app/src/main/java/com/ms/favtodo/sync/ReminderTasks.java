@@ -1,21 +1,11 @@
 package com.ms.favtodo.sync;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.widget.CheckBox;
-
-import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.utils.ReminderManager;
-import com.ms.favtodo.utils.TaskOperation;
 
-import java.util.List;
 
 public class ReminderTasks {
 
