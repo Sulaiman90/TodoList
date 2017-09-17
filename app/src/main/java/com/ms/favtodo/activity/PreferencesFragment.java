@@ -34,6 +34,8 @@ public class PreferencesFragment  extends PreferenceFragmentCompat {
 
         Context context = getActivity();
 
+        context.setTheme(R.style.settingsTheme);
+
         String timeString = PreferenceUtils.getDueTime12HrFormat(context);
 
         prefDueTime = findPreference(getString(R.string.pref_due_time_key));

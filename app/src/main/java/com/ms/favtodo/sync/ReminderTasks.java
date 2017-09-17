@@ -2,6 +2,9 @@ package com.ms.favtodo.sync;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+
+import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.utils.ReminderManager;
@@ -18,6 +21,7 @@ public class ReminderTasks {
             ReminderManager.cancelNotification(context,rowId);
            /* TaskOperation mTaskOperation = new TaskOperation(context.getApplicationContext());
             mTaskOperation.retrieveTasks(false);*/
+
         }
         else if (ACTION_DISMISS_NOTIFICATION.equals(action)) {
             ReminderManager.cancelNotification(context,rowId);

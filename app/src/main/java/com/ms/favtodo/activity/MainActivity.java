@@ -1,8 +1,12 @@
 package com.ms.favtodo.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +28,7 @@ import android.widget.TextView;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskDbHelper;
+import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.TaskOperation;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,12 +53,28 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int TODO_REQUEST_CODE = 100;
 
+    public static final String NOTIFY_ACTIVITY_ACTION = "notify_activity";
+
+    private BroadcastReceiver broadcastReceiver;
+
+    private LocalBroadcastManager manager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      //  Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-       // setSupportActionBar(toolbar);
+
+        manager = LocalBroadcastManager.getInstance(this);
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(TaskReminderIntentService.SERVICE_MESSAGE))
+                {
+                    //loadTasks();
+                }
+            }
+        };
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         quickTask = (EditText) findViewById(R.id.quick_task);
@@ -114,6 +135,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        manager.registerReceiver((broadcastReceiver),
+                new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        manager.unregisterReceiver(broadcastReceiver);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -131,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG,"requestCode "+requestCode +" resultCode "+resultCode);
+       // Log.d(TAG,"requestCode "+requestCode +" resultCode "+resultCode);
         if(requestCode==TODO_REQUEST_CODE && resultCode == RESULT_OK){
             loadTasks();
         }
@@ -181,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadTasks(){
+        TaskOperation.showDebugToast(this,"loadTasks");
         int totalTasks = taskOperation.retrieveTasks(completedTasksOnly);
         if(totalTasks==0){
             showHideEmptyViews(true,completedTasksOnly);
