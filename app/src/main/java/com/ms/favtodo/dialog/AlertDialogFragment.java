@@ -1,4 +1,4 @@
-package com.ms.favtodo.fragment;
+package com.ms.favtodo.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

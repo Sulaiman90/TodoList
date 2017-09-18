@@ -14,9 +14,8 @@ import com.ms.favtodo.activity.MainActivity;
 
 public class TaskReminderIntentService extends IntentService {
 
-    private static final String TAG = "TaskReminder";
+    private static final String TAG = "FavDo_TaskReminder";
 
-    private LocalBroadcastManager localBroadcastManager;
     public static final String SERVICE_RESULT = "com.service.result";
     public static final String SERVICE_MESSAGE = "com.service.message";
 
@@ -32,17 +31,15 @@ public class TaskReminderIntentService extends IntentService {
         ReminderTasks.executeTask(this,action,rowId);
 
        if (ReminderTasks.ACTION_TASK_COMPLETED.equals(action)) {
-            Log.d(TAG,"Main activity called");
-            Intent intent2 = new Intent(SERVICE_RESULT);
-            intent2.setAction(SERVICE_MESSAGE);
-            localBroadcastManager.sendBroadcast(intent2);
+            //Log.d(TAG,"Main activity called");
+           sendMessage();
         }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    private void sendMessage() {
+        Intent intent = new Intent(SERVICE_RESULT);
+        intent.putExtra(SERVICE_MESSAGE,MainActivity.UPDATE_LIST);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
+
 }

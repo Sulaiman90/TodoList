@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskDbHelper;
@@ -53,11 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int TODO_REQUEST_CODE = 100;
 
-    public static final String NOTIFY_ACTIVITY_ACTION = "notify_activity";
-
-    private BroadcastReceiver broadcastReceiver;
-
     private LocalBroadcastManager manager;
+
+    public static final String UPDATE_LIST = "update_list";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,15 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         manager = LocalBroadcastManager.getInstance(this);
 
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(TaskReminderIntentService.SERVICE_MESSAGE))
-                {
-                    //loadTasks();
-                }
-            }
-        };
+        manager.registerReceiver((broadcastReceiver),new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
+
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         quickTask = (EditText) findViewById(R.id.quick_task);
@@ -135,17 +127,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+           // Log.d(TAG,"onReceive "+intent.getAction());
+           // Toast.makeText(context,"onReceive",Toast.LENGTH_SHORT).show();
+            if (UPDATE_LIST.equals(intent.getStringExtra(TaskReminderIntentService.SERVICE_MESSAGE)))
+            {
+                loadTasks();
+            }
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
-        manager.registerReceiver((broadcastReceiver),
-                new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
+       // Log.d(TAG,"onStart");
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onResume() {
+        manager.registerReceiver((broadcastReceiver),new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
+        super.onResume();
+        //Log.d(TAG,"onResume");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Unregister since the activity is about to be closed.
         manager.unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -214,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadTasks(){
-        TaskOperation.showDebugToast(this,"loadTasks");
+        //Log.d(TAG,"loadTasks");
+        //TaskOperation.showDebugToast(this,"loadTasks");
         int totalTasks = taskOperation.retrieveTasks(completedTasksOnly);
         if(totalTasks==0){
             showHideEmptyViews(true,completedTasksOnly);
@@ -238,16 +251,6 @@ public class MainActivity extends AppCompatActivity {
         else{
             noFinishedTasks.setVisibility(View.GONE);
             mEmptyLayout.setVisibility(View.GONE);
-        }
-    }
-
-    private void setInfoText(Boolean completedTasksOnly){
-        noFinishedTasks.setVisibility(View.VISIBLE);
-        if(completedTasksOnly){
-            noFinishedTasks.setText(getResources().getString(R.string.no_finished_tasks));
-        }
-        else{
-            noFinishedTasks.setText(getResources().getString(R.string.no_tasks_todo));
         }
     }
 

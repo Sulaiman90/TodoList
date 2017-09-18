@@ -20,7 +20,7 @@ public class ReminderManager {
 
     public static void scheduleReminder(Calendar when, Context context, long taskId, String title){
 
-        //TaskOperation.showDebugToast(context,"scheduleReminder");
+        TaskOperation.showDebugToast(context,"scheduleReminder");
         //Log.d(TAG,"scheduleReminder");
 
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);

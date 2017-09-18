@@ -36,7 +36,7 @@ import android.widget.Toast;
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
-import com.ms.favtodo.fragment.AlertDialogFragment;
+import com.ms.favtodo.dialog.AlertDialogFragment;
 import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
@@ -109,6 +109,10 @@ public class NewTask extends AppCompatActivity {
         if (newTask) {
             linearLayout.setVisibility(View.GONE);
             mTimeText.setVisibility(View.INVISIBLE);
+
+            taskHour = -1;
+            taskMinute = -1;
+
         } else {
             getSupportActionBar().setTitle("");
             Bundle extras = getIntent().getExtras();
@@ -130,7 +134,7 @@ public class NewTask extends AppCompatActivity {
                 mTaskDone.setChecked(false);
             }
 
-            Log.d(TAG,"Title " +extras.getString("title") + " Date " + extras.getString("date") +" time "+timeText);
+            //Log.d(TAG,"Title " +extras.getString("title") + " Date " + extras.getString("date") +" time "+timeText);
 
             if (!dateText.matches("")) {
                 showHideButtons(mClearDate, true);
@@ -222,7 +226,7 @@ public class NewTask extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        Log.d(TAG, "newTask " + newTask);
+       // Log.d(TAG, "newTask " + newTask);
         if (newTask) {
             menu.findItem(R.id.delete_task).setVisible(false);
         }
@@ -282,8 +286,8 @@ public class NewTask extends AppCompatActivity {
             }
             //Toast.makeText(getApplicationContext(),todoDateAndTime,Toast.LENGTH_LONG).show();
             // Log.d(TAG,"time "+todoDateAndTime +" "+dateInMillis);
-           // Log.d(TAG, "date & time " + todoDate + " " + todoTime);
-          //  Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
+             Log.d(TAG, "date & time "+ todoTitle + todoDate + " " + todoTime);
+             Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -303,9 +307,12 @@ public class NewTask extends AppCompatActivity {
                 dbHelper.updateTask(taskId, values);
             }
 
-            //TaskOperation.showDebugToast(this,dateText);
+            Calendar now = Calendar.getInstance();
 
-            if (!dateText.matches("") && mCalendar.getTimeInMillis() > System.currentTimeMillis()) {
+            //TaskOperation.showDebugToast(this,mCalendar.getTimeInMillis() + " " +now.getTimeInMillis());
+            //Log.d(TAG,mCalendar.getTimeInMillis() + " " + now.getTimeInMillis());
+
+            if (!dateText.matches("") && mCalendar.getTimeInMillis() > now.getTimeInMillis() ) {
                 if (newTask) {
                     ReminderManager.scheduleReminder(mCalendar,this,rowId,todoTitle);
                 }
@@ -315,6 +322,9 @@ public class NewTask extends AppCompatActivity {
                         ReminderManager.scheduleReminder(mCalendar,this,taskId,todoTitle);
                     }
                 }
+            }
+            else{
+                TaskOperation.showDebugToast(this,"reminder not set");
             }
 
             db.close();
@@ -397,7 +407,7 @@ public class NewTask extends AppCompatActivity {
 
     public static void checkIfTimePassed(int selectedHour, int selectedMinute) {
         if(!mTaskDone.isChecked() && DateUtils.isToday(dateInMillis)){
-            Log.d(TAG,"isTimePassed "+selectedHour +" "+selectedMinute);
+           // Log.d(TAG,"isTimePassed "+selectedHour +" "+selectedMinute);
             if(taskOperation.isTimePassed(selectedHour,selectedMinute)){
                 mDateText.setTextColor(ContextCompat.getColor(mDateText.getContext(), R.color.red));
                 mTimeText.setTextColor(ContextCompat.getColor(mTimeText.getContext(), R.color.red));
@@ -416,7 +426,7 @@ public class NewTask extends AppCompatActivity {
     }
 
     public void showTimePickerDialog() {
-        Log.d(TAG,"showTimePickerDialog");
+        //Log.d(TAG,"showTimePickerDialog");
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getFragmentManager(), "timePicker");
     }

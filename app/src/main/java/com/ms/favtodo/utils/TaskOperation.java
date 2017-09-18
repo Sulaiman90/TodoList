@@ -112,7 +112,8 @@ public class TaskOperation {
                         noDateTasks.add(task);
                     }
                     else if(isPassed(date,task.getTaskHour(),task.getTaskMinute())){
-                       // Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
+                       // showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
+                        Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
                         overdueTasks.add(task);
                     }
                     else if(DateUtils.isToday(date)){
