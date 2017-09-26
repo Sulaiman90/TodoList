@@ -424,7 +424,7 @@ public class TaskOperation {
     }
 
     public static void showDebugToast(Context context,String msg){
-        Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
+        //Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
 }

@@ -324,7 +324,7 @@ public class NewTask extends AppCompatActivity {
                 }
             }
             else{
-                TaskOperation.showDebugToast(this,"reminder not set");
+               // TaskOperation.showDebugToast(this,"reminder not set");
             }
 
             db.close();
