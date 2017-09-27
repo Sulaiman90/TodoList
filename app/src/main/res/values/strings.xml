@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FavToDo</string>
+    <string name="app_name">To Do List</string>
     <string name="quick_task_hint">Enter Quick Task Here</string>
     <string name="title_activity_new_task">New Task</string>
     <string name="new_task_name">What is to be done?</string>
@@ -11,7 +11,7 @@
 
     <string name="delete_task">Delete Task</string>
     <string name="title_activity_finished_tasks">FinishedTasks</string>
-    <string name="title_activity_main">FavToDo</string>
+    <string name="title_activity_main">@string/app_name</string>
 
     <string name="task_alert">Enter a task name</string>
     <string name="task_finished_ques">Task finished?</string>
