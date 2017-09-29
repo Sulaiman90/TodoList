@@ -30,7 +30,7 @@ public class NotificationUtils {
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentTitle(TaskTitle)
                 .setContentText(context.getString(R.string.app_name))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(TaskTitle))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.app_name)))
                 .setSmallIcon(R.drawable.ic_done_white_24dp)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(contentIntent(context,rowId))
