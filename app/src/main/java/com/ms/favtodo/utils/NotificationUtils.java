@@ -29,7 +29,7 @@ public class NotificationUtils {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentTitle(TaskTitle)
-                .setContentText(rowId+"")
+                .setContentText(context.getString(R.string.app_name))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(TaskTitle))
                 .setSmallIcon(R.drawable.ic_done_white_24dp)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
