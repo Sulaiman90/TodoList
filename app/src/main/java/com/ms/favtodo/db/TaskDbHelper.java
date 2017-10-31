@@ -54,7 +54,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                     TaskEntry.TASK_DONE + "=?",
                     new String[] {String.valueOf(doneOrNot)},
                     null,null,
-                    TaskEntry.TASK_ID+" DESC",
+                    TaskEntry.TASK_DATE_IN_MS+" ASC",
                     null);
         if (cursor!=null){
             cursor.moveToFirst();

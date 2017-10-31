@@ -70,7 +70,7 @@ public class NewTask extends AppCompatActivity {
     public static int taskMinute = -1;
 
     private static String dateText = "";
-    private static String timeText;
+    private static String timeText = "";
     private int taskId = 0;
 
     private static Calendar mCalendar;
@@ -79,7 +79,11 @@ public class NewTask extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        dateInMillis = 0;
+
+        dateText = "";
+        timeText = "";
 
         dbHelper = new TaskDbHelper(this);
 
@@ -246,7 +250,6 @@ public class NewTask extends AppCompatActivity {
             saveTodo();
             return true;
         } else if (id == R.id.delete_task) {
-            // continueDelete();
             // Create a new AlertDialogFragment
             mDialog = AlertDialogFragment.newInstance();
             // Show AlertDialogFragment
@@ -285,9 +288,11 @@ public class NewTask extends AppCompatActivity {
                 todoFinished = 0;
             }
             //Toast.makeText(getApplicationContext(),todoDateAndTime,Toast.LENGTH_LONG).show();
-            // Log.d(TAG,"time "+todoDateAndTime +" "+dateInMillis);
+             Log.d(TAG,"time "+todoDateAndTime +" "+dateInMillis);
              Log.d(TAG, "date & time "+ todoTitle + todoDate + " " + todoTime);
-             Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
+           //  Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
+
+            TaskOperation.showDebugToast(this,dateInMillis+"");
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -350,6 +355,12 @@ public class NewTask extends AppCompatActivity {
             String todoTitle = mTitleText.getText().toString();
             int deleteCount = dbHelper.deleteTask(taskId);
            // Log.i(TAG, "task deleted " + deleteCount);
+            if(toastobject!= null){
+                toastobject.cancel();
+            }
+            toastobject = Toast.makeText(getApplicationContext(),
+                    getResources().getString(R.string.task_deleted), Toast.LENGTH_SHORT);
+            toastobject.show();
             Intent intent = new Intent();
             setResult(RESULT_OK,intent);
             finish();
@@ -554,7 +565,7 @@ public class NewTask extends AppCompatActivity {
             mCalendar.set(Calendar.HOUR_OF_DAY, selectedHour);
             mCalendar.set(Calendar.MINUTE, selectedMinute);
 
-            //dateInMillis = mCalendar.getTimeInMillis();
+            dateInMillis = mCalendar.getTimeInMillis();
 
             int hour = selectedHour;
             int minutes = selectedMinute;

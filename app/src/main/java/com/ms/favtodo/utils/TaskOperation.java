@@ -94,8 +94,8 @@ public class TaskOperation {
                     task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
                     task.setDateAndTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_AND_TIME)));
 
-                   /* Log.d(TAG,"Title "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE))
-                            + " date "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));*/
+                   Log.d(TAG,"Title "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE))
+                            + " date "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_IN_MS)));
 
                     task.setDate(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));
                     task.setTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME)));
@@ -112,7 +112,8 @@ public class TaskOperation {
                         noDateTasks.add(task);
                     }
                     else if(isPassed(date,task.getTaskHour(),task.getTaskMinute())){
-                       // showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
+                       showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
+                        Log.d(TAG,"isToday "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
                         Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
                         overdueTasks.add(task);
                     }
@@ -424,7 +425,7 @@ public class TaskOperation {
     }
 
     public static void showDebugToast(Context context,String msg){
-        //Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
+       // Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
 }

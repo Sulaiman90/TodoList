@@ -42,6 +42,4 @@ public class AlarmReceiver extends BroadcastReceiver {
             NotificationUtils.createNotification(context,taskTitle,rowId);
         }
     }
-
-
 }

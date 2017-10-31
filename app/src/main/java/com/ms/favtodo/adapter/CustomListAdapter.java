@@ -13,6 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
@@ -40,6 +41,8 @@ public class CustomListAdapter extends BaseAdapter{
     private LayoutInflater inflater;
     private Context mContext;
     private TaskDetails taskDetails;
+
+    private Toast toastobject;
 
     private static final String TAG = "CustomListAdapter";
 
@@ -183,15 +186,23 @@ public class CustomListAdapter extends BaseAdapter{
                       //  Log.d(TAG,"checked:task "+taskDetails.getTitle()+" "+position);
                         ContentValues values = new ContentValues();
                         taskDetails = taskList.get(position);
+                        String toastMsg;
                         if (((CheckBox) v).isChecked()) {
                             values.put(TaskEntry.TASK_DONE, 1);
+                            toastMsg = mContext.getResources().getString(R.string.task_completed);
                         } else {
                             values.put(TaskEntry.TASK_DONE, 0);
+                            toastMsg = mContext.getResources().getString(R.string.task_not_completed);
                         }
                         dbHelper.updateTask(taskDetails.getTaskId(), values);
                         ReminderManager.cancelReminder(mContext,taskDetails.getTaskId());
                         View v1 = (View) v.getParent();
                         removeListItem(v1,position);
+                        if(toastobject!= null){
+                            toastobject.cancel();
+                        }
+                        toastobject = Toast.makeText(mContext,toastMsg,Toast.LENGTH_SHORT);
+                        toastobject.show();
                     }
                 });
             }
