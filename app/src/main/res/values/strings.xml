@@ -17,7 +17,7 @@
     <string name="task_finished_ques">Task finished?</string>
     <string name="task_finished_excl">Task finished!</string>
 
-    <string name="no_tasks_todo">No tasks /n Add a task</string>
+    <string name="no_tasks_todo">Add a task</string>
     <string name="no_finished_tasks">No completed tasks</string>
 
     <string name="overdue">Overdue</string>
