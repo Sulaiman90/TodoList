@@ -6,10 +6,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.activity.NewTask;
@@ -24,9 +27,12 @@ import com.ms.favtodo.sync.TaskReminderIntentService;
  */
 
 public class NotificationUtils {
+    private static final String TAG = NotificationUtils.class.getSimpleName();
 
     public static void createNotification(Context context,String TaskTitle,long rowId){
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+       // Log.d(TAG,"createNotification "+alarmSound);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentTitle(TaskTitle)
                 .setContentText(context.getString(R.string.app_name))
@@ -36,17 +42,19 @@ public class NotificationUtils {
                 .setContentIntent(contentIntent(context,rowId))
                 .addAction(taskCompletedAction(context,rowId))
                 .addAction(ignoreReminderAction(context,rowId))
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setSound(alarmSound);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
+        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+
+        Notification notification = notificationBuilder.build();
+        notification.flags = Notification.FLAG_INSISTENT;
 
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        /*  REMINDER_NOTIFICATION_ID allows you to update or cancel the notification later on */
-        notificationManager.notify((int)rowId, notificationBuilder.build());
+        /*  NOTIFICATION_ID allows you to update or cancel the notification later on */
+        notificationManager.notify((int)rowId, notification);
     }
 
     private static PendingIntent contentIntent(Context context, long rowId) {

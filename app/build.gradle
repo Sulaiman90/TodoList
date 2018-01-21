@@ -34,5 +34,7 @@ dependencies {
     compile "com.android.support:design:${supportLibraryVersion}"
     compile 'com.google.firebase:firebase-appindexing:11.8.0'
     compile "com.android.support:support-vector-drawable:${supportLibraryVersion}"
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     testCompile 'junit:junit:4.12'
 }

@@ -22,7 +22,6 @@ public class ReminderManager {
 
         TaskOperation.showDebugToast(context,"scheduleReminder");
         //Log.d(TAG,"scheduleReminder");
-
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         Intent i = new Intent(context, AlarmReceiver.class);
@@ -46,7 +45,7 @@ public class ReminderManager {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        /*  REMINDER_NOTIFICATION_ID allows you to update or cancel the notification later on */
+        /*  NOTIFICATION_ID allows you to update or cancel the notification later on */
         notificationManager.cancel((int)notificationId);
     }
 

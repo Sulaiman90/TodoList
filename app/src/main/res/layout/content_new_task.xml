@@ -105,28 +105,72 @@
             >
 
             <EditText
+                android:id="@+id/timeText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/new_time_hint"
-                android:backgroundTint="@color/colorPrimary"
-                android:id="@+id/timeText"
-                android:focusable="false"
-                android:inputType="time"
                 android:layout_weight="9"
+                android:backgroundTint="@color/colorPrimary"
+                android:focusable="false"
+                android:hint="@string/new_time_hint"
+                android:inputType="time"
                 />
 
             <ImageButton
+                android:id="@+id/clear_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_clear_white_24dp"
-                android:background="@drawable/round_button"
-                android:padding="1dp"
                 android:layout_margin="8dp"
                 android:layout_weight="0"
-                android:id="@+id/clear_time"
+                android:background="@drawable/round_button"
+                android:padding="1dp"
+                android:src="@drawable/ic_clear_white_24dp"
+                />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alert Notification"
+                android:id="@+id/alert_label"
                 />
 
-        </LinearLayout>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/alert_label"
+                android:id="@+id/choose_alarm_sound"
+                android:textAllCaps="false"
+                android:text="Select Sound"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vibrate"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:layout_toLeftOf="@id/vibrate_switch"
+                android:layout_below="@+id/alert_label"
+                android:id="@+id/vibrate_label"
+                />
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/alert_label"
+                android:layout_marginTop="4dp"
+                android:paddingTop="8dp"
+                android:paddingLeft="8dp"
+                android:paddingBottom="8dp"
+                android:id="@+id/vibrate_switch"/>
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 

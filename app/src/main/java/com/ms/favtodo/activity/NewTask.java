@@ -1,5 +1,6 @@
 package com.ms.favtodo.activity;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -12,6 +13,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
@@ -43,6 +46,9 @@ import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class NewTask extends AppCompatActivity {
 
@@ -80,15 +86,14 @@ public class NewTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_task);
 
-        dateInMillis = 0;
+        ButterKnife.bind(this);
 
+        dateInMillis = 0;
         dateText = "";
         timeText = "";
 
         dbHelper = new TaskDbHelper(this);
-
         taskOperation = new TaskOperation(this);
-
         mCalendar = Calendar.getInstance();
 
         mTitleText = (EditText) findViewById(R.id.title);
@@ -219,6 +224,31 @@ public class NewTask extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    @OnClick(R.id.choose_alarm_sound)
+    void chooseAlarmSound(){
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        this.startActivityForResult(intent, 5);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+        String chosenRingtone = "";
+        if (resultCode == Activity.RESULT_OK && requestCode == 5) {
+            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            if (uri != null) {
+                chosenRingtone = uri.toString();
+            }
+            else {
+                chosenRingtone = null;
+            }
+        }
+        Log.d(TAG,"chosenRingtone "+chosenRingtone);
     }
 
     @Override
