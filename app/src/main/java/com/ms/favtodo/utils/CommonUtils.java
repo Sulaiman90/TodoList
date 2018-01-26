@@ -11,6 +11,12 @@ public class CommonUtils {
 
     public static Uri getDefaultNotificationSound(){
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(alarmSound == null){
+            alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            if(alarmSound == null){
+                alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            }
+        }
         return alarmSound;
     }
 }
