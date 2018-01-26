@@ -30,7 +30,7 @@ public class NotificationUtils {
     private static final String TAG = NotificationUtils.class.getSimpleName();
 
     public static void createNotification(Context context,String TaskTitle,long rowId){
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        //Uri alarmSound = CommonUtils.getDefaultNotificationSound();
        // Log.d(TAG,"createNotification "+alarmSound);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
@@ -38,17 +38,25 @@ public class NotificationUtils {
                 .setContentText(context.getString(R.string.app_name))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.app_name)))
                 .setSmallIcon(R.drawable.ic_done_white_24dp)
-                .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(contentIntent(context,rowId))
                 .addAction(taskCompletedAction(context,rowId))
                 .addAction(ignoreReminderAction(context,rowId))
-                .setAutoCancel(true)
-                .setSound(alarmSound);
+                .setAutoCancel(true);
 
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
         Notification notification = notificationBuilder.build();
         notification.flags = Notification.FLAG_INSISTENT;
+
+        if(PreferenceUtils.isVibrateEnabled(context)){
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
+        }
+
+        Uri notificationSound = Uri.parse(PreferenceUtils.getNotificationSound(context));
+
+        if(true){
+            notification.sound = notificationSound;
+        }
 
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);

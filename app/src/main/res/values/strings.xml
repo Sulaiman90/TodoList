@@ -48,15 +48,25 @@
         <item>Completed</item>
     </string-array>
 
-    <!-- Strings related to Settings -->
-    <string name="notification_preference">Notifications</string>
-
-    <string name="PREF_FILE_SETTINGS" translatable="false">PREF_FILE_SETTINGS</string>
+    <!-- Strings related to Preferences -->
+    <string name="pref_title_notifications">Notifications</string>
 
     <string name="pref_due_time_key">alarm_time</string>
     <string name="pref_due_time_12_hr">due_time_value</string>
     <string name="pref_due_hour_minute">due_hour_minute</string>
     <string name="pref_due_time_summary">Notifications for tasks without due times will appear at </string>
+
+    <string name="pref_enable_sound_key">enable_sound_key</string>
+    <string name="pref_enable_sound_title">Enable sound for notifications</string>
+
+    <string name="pref_notification_sound_key">notification_sound_key</string>
+    <string name="pref_notification_sound_title">Notification sound</string>
+    <string name="pref_notification_sound_summary">Default sound</string>
+    <string name="no_sound">None</string>
+
+    <string name="pref_notification_vibrate_key">vibrate_notification</string>
+    <string name="pref_notification_vibrate_title">Vibrate</string>
+    <string name="pref_notification_vibrate_summary">Vibrate on notification</string>
 
 </resources>
 

@@ -13,6 +13,17 @@ public class PreferenceUtils {
         return sharedPref.getString(context.getString(R.string.pref_due_time_12_hr),"6 PM");
     }
 
+    public static String getNotificationSound(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getString(context.getString(R.string.pref_notification_sound_key),
+                CommonUtils.getDefaultNotificationSound().toString());
+    }
+
+    public static boolean isVibrateEnabled(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.pref_notification_vibrate_key), false);
+    }
+
     private static String getDueTimeHourAndMin(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.pref_due_hour_minute),"18:0");

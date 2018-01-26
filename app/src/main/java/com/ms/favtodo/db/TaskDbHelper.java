@@ -32,7 +32,10 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 TaskEntry.TASK_DONE + " INT, " +
                 TaskEntry.TASK_DATE_IN_MS + " INT, " +
                 TaskEntry.TASK_HOUR + " INT, " +
-                TaskEntry.TASK_MINUTE + " INT" +
+                TaskEntry.TASK_MINUTE + " INT, " +
+                TaskEntry.NOTIFICATION_SOUND + " TEXT, " +
+                TaskEntry.NOTIFICATION_VIBRATE + " INT, " +
+                TaskEntry.NOTIFICATION_SOUND_ENABLED + " INT " +
                 ");";
         db.execSQL(createTable);
     }
@@ -50,7 +53,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                                          TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
         Cursor cursor = this.getReadableDatabase().query(
                     TaskEntry.TABLE_NAME,
-                    columns,
+                    null,
                     TaskEntry.TASK_DONE + "=?",
                     new String[] {String.valueOf(doneOrNot)},
                     null,null,
@@ -68,7 +71,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
         Cursor cursor = this.getReadableDatabase().query(
                 TaskEntry.TABLE_NAME,
-                columns,
+                null,
                 TaskEntry.TASK_ID + "=?",
                 new String[] {String.valueOf(rowId)},
                 null,
@@ -82,9 +85,6 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     }
 
     public Cursor fetchTasksWithoutDueTime(){
-
-      //  long timeNow = loc.getTimeInMillis();
-
         String empty = "";
         Cursor cursor = this.getReadableDatabase().query(
                 TaskEntry.TABLE_NAME,
@@ -103,25 +103,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-     public int updateTaskStatus(String taskTitle,ContentValues cv) {
-       SQLiteDatabase db = this.getWritableDatabase();
-
-        // updating row
-         int result = 0;
-         try{
-             result = db.update(TaskEntry.TABLE_NAME, cv,  TaskEntry.TASK_TITLE + " = ?",
-                     new String[] {taskTitle});
-             Log.d(TAG,"updateTaskStatus rows "+result);
-         }
-         catch (Exception e){
-             e.printStackTrace();
-         }
-         return result;
-    }
-
     public int updateTask(int taskId,ContentValues cv) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         // updating row
         int result = 0;
         try{
@@ -138,7 +121,6 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = 0;
         try {
-           // db.delete(TaskEntry.TABLE_NAME, TaskEntry.TASK_TITLE + " = ?", new String[]{taskTitle});
             result = db.delete(TaskEntry.TABLE_NAME, TaskEntry.TASK_ID + " = ?", new String[]{Integer.toString(taskId)});
             Log.d(TAG,"Deleted rows "+result);
         }
@@ -157,7 +139,6 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     public long insertTask(String title,String date,String time,String dateAndTime,int done,long dateInMs , int hour, int minute){
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values =  new ContentValues();
         values.put(TaskEntry.TASK_TITLE,title);
         values.put(TaskEntry.TASK_DATE,date);
@@ -173,8 +154,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public int rowcount()
-    {
+    public int rowcount() {
         int row;
         String selectQuery = "SELECT  * FROM " + TaskEntry.TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();

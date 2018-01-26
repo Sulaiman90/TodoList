@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
- <PreferenceCategory android:title="@string/notification_preference">
-
+ <PreferenceCategory android:title="@string/pref_title_notifications">
      <Preference
          android:key="@string/pref_due_time_key"
-         android:title="Default reminder"
+         android:title="Default reminder Time"
          android:defaultValue="18:00"
          android:summary="Notifications for tasks without due times will appear at 6 PM "/>
 
+     <SwitchPreference
+         android:key="@string/pref_enable_sound_key"
+         android:title="@string/pref_enable_sound_title"
+         android:defaultValue="false"
+         />
+
+     <RingtonePreference
+         android:defaultValue="content://settings/system/notification_sound"
+         android:key="@string/pref_notification_sound_key"
+         android:title="@string/pref_notification_sound_title"
+         android:ringtoneType="all"
+         android:summary="@string/pref_notification_sound_summary"
+         android:showDefault="true"
+         android:showSilent="true"
+         android:dependency="@string/pref_enable_sound_key"
+         />
+
+     <SwitchPreference
+         android:key="@string/pref_notification_vibrate_key"
+         android:title="@string/pref_notification_vibrate_title"
+         android:summary="@string/pref_notification_vibrate_summary"
+         android:defaultValue="false"
+         />
     </PreferenceCategory>
-
-
-
 </PreferenceScreen>
 
-
-   <!-- android:summary="Notifications for tasks without due times will appear at 6 PM "-->
