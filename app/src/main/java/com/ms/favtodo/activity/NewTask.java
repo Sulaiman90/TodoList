@@ -11,6 +11,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.media.RingtoneManager;
@@ -27,11 +28,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -40,6 +43,7 @@ import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.dialog.AlertDialogFragment;
+import com.ms.favtodo.model.TaskDetails;
 import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
@@ -47,6 +51,7 @@ import com.ms.favtodo.utils.TaskOperation;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -81,6 +86,14 @@ public class NewTask extends AppCompatActivity {
 
     private static Calendar mCalendar;
 
+    private static LinearLayout mTimeLayout;
+    private String notificationSound = "";
+    private TaskDetails task;
+
+    @BindView(R.id.enableVibrate_switch) Switch mVibrateSwitch;
+    @BindView(R.id.enableSound_cb) CheckBox mSoundCheckBox;
+    @BindView(R.id.choose_alarm_sound) Button mChooseSoundButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,68 +107,93 @@ public class NewTask extends AppCompatActivity {
 
         dbHelper = new TaskDbHelper(this);
         taskOperation = new TaskOperation(this);
+        task = new TaskDetails();
         mCalendar = Calendar.getInstance();
 
-        mTitleText = (EditText) findViewById(R.id.title);
-        mDateText = (EditText) findViewById(R.id.dateText);
-        mTimeText = (EditText) findViewById(R.id.timeText);
-        mTaskStatus = (TextView) findViewById(R.id.task_status);
-        mTaskDone = (CheckBox) findViewById(R.id.task_finished);
+        mTitleText =  findViewById(R.id.title);
+        mDateText =  findViewById(R.id.dateText);
+        mTimeText = findViewById(R.id.timeText);
+        mTaskStatus =  findViewById(R.id.task_status);
+        mTaskDone = findViewById(R.id.task_finished);
 
-        mClearDate = (ImageButton) findViewById(R.id.clear_date);
-        mClearTime = (ImageButton) findViewById(R.id.clear_time);
+        mClearDate = findViewById(R.id.clear_date);
+        mClearTime = findViewById(R.id.clear_time);
 
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.mark_as_done);
+        mTimeLayout = findViewById(R.id.timeLinearLayout);
+
+        LinearLayout linearLayout = findViewById(R.id.mark_as_done);
 
         Intent intent = getIntent();
         newTask = intent.getBooleanExtra("NewTask", false);
 
         mClearDate.setVisibility(View.GONE);
-        mTimeText.setVisibility(View.GONE);
         mClearTime.setVisibility(View.GONE);
         //Log.d(TAG,"New Task "+newTask);
 
         if (newTask) {
             linearLayout.setVisibility(View.GONE);
-            mTimeText.setVisibility(View.INVISIBLE);
-
+            mTimeLayout.setVisibility(View.GONE);
             taskHour = -1;
             taskMinute = -1;
-
+            notificationSound = PreferenceUtils.getNotificationSound(this);
+            mSoundCheckBox.setChecked(PreferenceUtils.isSoundEnabled(this));
+            mVibrateSwitch.setChecked(PreferenceUtils.isVibrateEnabled(this));
         } else {
             getSupportActionBar().setTitle("");
             Bundle extras = getIntent().getExtras();
-            mTitleText.setText(extras.getString("title"));
-            int done = extras.getInt("doneOrNot");
             taskId  = extras.getInt("id");
-            dateInMillis = extras.getLong("timeInMs");
-            taskHour = extras.getInt("hour");
-            taskMinute = extras.getInt("minute");
 
-            dateText = extras.getString("date");
+            Cursor c1 =  dbHelper.fetchTask(taskId);
+
+            task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));
+            task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
+            task.setDateAndTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_AND_TIME)));
+            task.setDate(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));
+            task.setTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME)));
+            task.setTaskDone(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.TASK_DONE)));
+            task.setDateInMilliSeconds(c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS)));
+            task.setTaskHour(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR)));
+            task.setTaskMinute(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE)));
+            task.setVibrateEnabled(c1.getInt(c1.getColumnIndex(TaskEntry.NOTIFICATION_VIBRATE)) == 1);
+            task.setSoundEnabled(c1.getInt(c1.getColumnIndex(TaskEntry.NOTIFICATION_SOUND_ENABLED)) == 1);
+            task.setNotificationSound(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND)));
+
+            mTitleText.setText(task.getTitle());
+            boolean done = task.getTaskDone() == 1;
+            dateInMillis = task.getDateInMilliSeconds();
+            taskHour = task.getTaskHour();
+            taskMinute = task.getTaskMinute();
+            dateText = task.getDate();
+            timeText = task.getTime();
+            notificationSound = task.getNotificationSound();
+
             mDateText.setText(dateText);
-            timeText = extras.getString("time");
             mTimeText.setText(timeText);
-
-            if (done == 1) {
-                mTaskDone.setChecked(true);
-            } else {
-                mTaskDone.setChecked(false);
-            }
+            mTaskDone.setChecked(done);
+            mSoundCheckBox.setChecked(task.isSoundEnabled());
+            mVibrateSwitch.setChecked(task.isVibrateEnabled());
 
             //Log.d(TAG,"Title " +extras.getString("title") + " Date " + extras.getString("date") +" time "+timeText);
 
-            if (!dateText.matches("")) {
+            if (dateText.matches("")) {
+                showHideButtons(mClearDate, false);
+                mTimeLayout.setVisibility(View.GONE);
+            }
+            else {
                 showHideButtons(mClearDate, true);
                 checkIfDatePassed(dateInMillis,dateText);
                 mTimeText.setVisibility(View.VISIBLE);
-                if (!timeText.matches("")) {
-                    checkIfTimePassed(taskHour,taskMinute);
+                if (timeText.matches("")) {
+                    showHideButtons(mClearTime, false);
+                }
+                else{
                     showHideButtons(mClearTime, true);
+                    checkIfTimePassed(taskHour,taskMinute);
                 }
             }
-
         }
+
+        mChooseSoundButton.setEnabled(mSoundCheckBox.isChecked());
 
         mTitleText.setOnClickListener(new OnClickListener() {
             @Override
@@ -207,7 +245,7 @@ public class NewTask extends AppCompatActivity {
                 // mClearDate.setVisibility(View.GONE);
                 showHideButtons(mClearDate, false);
                 showHideButtons(mClearTime, false);
-                mTimeText.setVisibility(View.GONE);
+                mTimeLayout.setVisibility(View.GONE);
                 resetTexts();
                 resetTextColors();
             }
@@ -224,15 +262,23 @@ public class NewTask extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    @OnClick(R.id.enableSound_cb)
+    void enableChangeSoundButton(){
+        mChooseSoundButton.setEnabled(mSoundCheckBox.isChecked());
     }
 
     @OnClick(R.id.choose_alarm_sound)
     void chooseAlarmSound(){
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        Uri existingSound =  Uri.parse(PreferenceUtils.getNotificationSound(this));
+        if (!newTask) {
+            existingSound =  Uri.parse(notificationSound);
+        }
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,existingSound);
         this.startActivityForResult(intent, 5);
     }
 
@@ -243,6 +289,7 @@ public class NewTask extends AppCompatActivity {
             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             if (uri != null) {
                 chosenRingtone = uri.toString();
+                notificationSound = chosenRingtone;
             }
             else {
                 chosenRingtone = null;
@@ -296,6 +343,8 @@ public class NewTask extends AppCompatActivity {
         String todoTime;
         String todoDateAndTime;
         int todoFinished;
+        int vibrateEnabled = 0;
+        int soundEnabled = 0;
 
         //Log.d(TAG,"time "+todoTitle);
         if (!TextUtils.isEmpty(todoTitle)) {
@@ -322,7 +371,14 @@ public class NewTask extends AppCompatActivity {
              Log.d(TAG, "date & time "+ todoTitle + todoDate + " " + todoTime);
            //  Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
 
-            TaskOperation.showDebugToast(this,dateInMillis+"");
+           // TaskOperation.showDebugToast(this,dateInMillis+"");
+
+            if(mVibrateSwitch.isChecked()){
+                vibrateEnabled = 1;
+            }
+            if(mSoundCheckBox.isChecked()){
+                soundEnabled = 1;
+            }
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -334,6 +390,9 @@ public class NewTask extends AppCompatActivity {
             values.put(TaskEntry.TASK_DATE_IN_MS, dateInMillis);
             values.put(TaskEntry.TASK_HOUR, taskHour);
             values.put(TaskEntry.TASK_MINUTE, taskMinute);
+            values.put(TaskEntry.NOTIFICATION_SOUND, notificationSound);
+            values.put(TaskEntry.NOTIFICATION_VIBRATE, vibrateEnabled);
+            values.put(TaskEntry.NOTIFICATION_SOUND_ENABLED, soundEnabled);
 
             long rowId = taskId;
             if (newTask) {
@@ -535,7 +594,9 @@ public class NewTask extends AppCompatActivity {
 
             checkIfDatePassed(dateInMillis,dateText);
 
+            mTimeLayout.setVisibility(View.VISIBLE);
             mTimeText.setVisibility(View.VISIBLE);
+
             showHideButtons(mClearDate, true);
 
         }

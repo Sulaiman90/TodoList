@@ -10,13 +10,16 @@ import android.net.Uri;
 public class CommonUtils {
 
     public static Uri getDefaultNotificationSound(){
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if(alarmSound == null){
-            alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            if(alarmSound == null){
-                alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(notificationSound == null){
+            notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            if(notificationSound == null){
+                notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
             }
         }
-        return alarmSound;
+        return notificationSound;
     }
+
+
+
 }

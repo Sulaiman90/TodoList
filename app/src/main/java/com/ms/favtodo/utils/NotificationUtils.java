@@ -30,7 +30,6 @@ public class NotificationUtils {
     private static final String TAG = NotificationUtils.class.getSimpleName();
 
     public static void createNotification(Context context,String TaskTitle,long rowId){
-        //Uri alarmSound = CommonUtils.getDefaultNotificationSound();
        // Log.d(TAG,"createNotification "+alarmSound);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
@@ -46,16 +45,26 @@ public class NotificationUtils {
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
         Notification notification = notificationBuilder.build();
-        notification.flags = Notification.FLAG_INSISTENT;
+        //notification.flags = Notification.FLAG_INSISTENT;
 
-        if(PreferenceUtils.isVibrateEnabled(context)){
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
+        TaskDbHelper dbHelper = new TaskDbHelper(context);
+        Cursor c1 =  dbHelper.fetchTask(rowId);
+
+        boolean soundEnabled = false;
+
+        if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND_ENABLED)) == 1){
+            soundEnabled = true;
         }
 
-        Uri notificationSound = Uri.parse(PreferenceUtils.getNotificationSound(context));
+        Uri notificationSound = Uri.parse(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND)));
+       // notificationSound = Uri.parse(PreferenceUtils.getNotificationSound(context));
+        Log.d(TAG, notificationSound.toString());
 
-        if(true){
+        if(soundEnabled){
             notification.sound = notificationSound;
+        }
+        if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1){
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
         }
 
         NotificationManager notificationManager = (NotificationManager)
@@ -66,16 +75,15 @@ public class NotificationUtils {
     }
 
     private static PendingIntent contentIntent(Context context, long rowId) {
+        //Log.e(TAG,"rowId "+rowId);
         Intent startActivityIntent = new Intent(context, NewTask.class);
 
-        TaskDbHelper dbHelper = new TaskDbHelper(context);
+       /* TaskDbHelper dbHelper = new TaskDbHelper(context);
         Cursor c1 =  dbHelper.fetchTask(rowId);
-
-        //Log.e(TAG,"rowId "+rowId);
-
         TaskDetails task = new TaskDetails();
-        task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));
-        task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
+        task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));*/
+
+    /*    task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
         task.setDateAndTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_AND_TIME)));
         task.setDate(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));
         task.setTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME)));
@@ -85,13 +93,14 @@ public class NotificationUtils {
         task.setTaskMinute(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE)));
 
         startActivityIntent.putExtra("title", task.getTitle());
-        startActivityIntent.putExtra("id", task.getTaskId());
         startActivityIntent.putExtra("date", task.getDate());
         startActivityIntent.putExtra("time", task.getTime());
         startActivityIntent.putExtra("doneOrNot", task.getTaskDone());
         startActivityIntent.putExtra("timeInMs", task.getDateInMilliSeconds());
         startActivityIntent.putExtra("hour", task.getTaskHour());
-        startActivityIntent.putExtra("minute", task.getTaskMinute());
+        startActivityIntent.putExtra("minute", task.getTaskMinute());*/
+
+        startActivityIntent.putExtra("id", rowId);
         startActivityIntent.putExtra("TaskRowId",rowId);
 
         return PendingIntent.getActivity(

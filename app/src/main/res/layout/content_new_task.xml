@@ -102,6 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:id="@+id/timeLinearLayout"
             >
 
             <EditText
@@ -139,37 +140,39 @@
                 android:id="@+id/alert_label"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="8dp"
+                />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/enableSound_cb"
+                android:layout_below="@+id/alert_label"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:text="Enable Sound"/>
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vibrate"
+                android:id="@+id/enableVibrate_switch"
+                android:layout_below="@id/alert_label"
+                android:layout_alignParentEnd="true"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:switchPadding="8dp"
                 />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/alert_label"
+                android:layout_below="@+id/enableSound_cb"
                 android:id="@+id/choose_alarm_sound"
                 android:textAllCaps="false"
-                android:text="Select Sound"/>
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                android:enabled="false"
+                android:layout_marginTop="8dp"
+                android:text="Change Sound"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vibrate"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"
-                android:layout_toLeftOf="@id/vibrate_switch"
-                android:layout_below="@+id/alert_label"
-                android:id="@+id/vibrate_label"
-                />
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/alert_label"
-                android:layout_marginTop="4dp"
-                android:paddingTop="8dp"
-                android:paddingLeft="8dp"
-                android:paddingBottom="8dp"
-                android:id="@+id/vibrate_switch"/>
 
         </RelativeLayout>
 

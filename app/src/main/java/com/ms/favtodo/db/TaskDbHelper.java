@@ -29,13 +29,13 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 TaskEntry.TASK_DATE + " TEXT, " +
                 TaskEntry.TASK_TIME + " TEXT, " +
                 TaskEntry.TASK_DATE_AND_TIME + " TEXT, " +
-                TaskEntry.TASK_DONE + " INT, " +
+                TaskEntry.TASK_DONE + " INT DEFAULT 0, " +
                 TaskEntry.TASK_DATE_IN_MS + " INT, " +
                 TaskEntry.TASK_HOUR + " INT, " +
                 TaskEntry.TASK_MINUTE + " INT, " +
                 TaskEntry.NOTIFICATION_SOUND + " TEXT, " +
-                TaskEntry.NOTIFICATION_VIBRATE + " INT, " +
-                TaskEntry.NOTIFICATION_SOUND_ENABLED + " INT " +
+                TaskEntry.NOTIFICATION_VIBRATE + " INT DEFAULT 0, " +
+                TaskEntry.NOTIFICATION_SOUND_ENABLED + " INT DEFAULT 0" +
                 ");";
         db.execSQL(createTable);
     }
@@ -137,7 +137,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public long insertTask(String title,String date,String time,String dateAndTime,int done,long dateInMs , int hour, int minute){
+    public long insertTask(String title,String date,String time,String dateAndTime,int done,long dateInMs ,
+                           int hour, int minute){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values =  new ContentValues();
         values.put(TaskEntry.TASK_TITLE,title);

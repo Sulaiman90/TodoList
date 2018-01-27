@@ -15,7 +15,33 @@ public class TaskDetails {
     private int taskMinute = 0;
     private long dateInMilliSeconds=0;
     private String date="";
+    private boolean vibrateEnabled = false;
+    private boolean soundEnabled = false;
+    private String notificationSound ="";
 
+    public boolean isVibrateEnabled() {
+        return vibrateEnabled;
+    }
+
+    public void setVibrateEnabled(boolean vibrateEnabled) {
+        this.vibrateEnabled = vibrateEnabled;
+    }
+
+    public boolean isSoundEnabled() {
+        return soundEnabled;
+    }
+
+    public void setSoundEnabled(boolean soundEnabled) {
+        this.soundEnabled = soundEnabled;
+    }
+
+    public String getNotificationSound() {
+        return notificationSound;
+    }
+
+    public void setNotificationSound(String notificationSound) {
+        this.notificationSound = notificationSound;
+    }
 
     public int getTaskMinute() {
         return taskMinute;
@@ -48,7 +74,6 @@ public class TaskDetails {
     public void setDateInMilliSeconds(long dateInMilliSeconds) {
         this.dateInMilliSeconds = dateInMilliSeconds;
     }
-
 
     public String getDateAndTime() {
         return dateAndTime;

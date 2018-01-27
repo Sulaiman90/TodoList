@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
         manager.registerReceiver((broadcastReceiver),new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
 
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
         quickTask = (EditText) findViewById(R.id.quick_task);
         tickBtn = (ImageButton) findViewById(R.id.tick_btn);

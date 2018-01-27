@@ -9,7 +9,7 @@ import android.provider.BaseColumns;
 public class TaskContract {
 
     public static final String DATABASE_NAME = "Todo";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
 
     public class TaskEntry implements BaseColumns {
         public static final String TABLE_NAME = "tasks";

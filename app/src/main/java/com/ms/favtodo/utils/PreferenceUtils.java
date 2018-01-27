@@ -24,6 +24,11 @@ public class PreferenceUtils {
         return sharedPref.getBoolean(context.getString(R.string.pref_notification_vibrate_key), false);
     }
 
+    public static boolean isSoundEnabled(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.pref_enable_sound_key), false);
+    }
+
     private static String getDueTimeHourAndMin(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.pref_due_hour_minute),"18:0");

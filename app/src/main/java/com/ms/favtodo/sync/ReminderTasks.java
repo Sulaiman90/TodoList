@@ -19,9 +19,6 @@ public class ReminderTasks {
         if (ACTION_TASK_COMPLETED.equals(action)) {
             taskCompleted(context,(int)rowId);
             ReminderManager.cancelNotification(context,rowId);
-           /* TaskOperation mTaskOperation = new TaskOperation(context.getApplicationContext());
-            mTaskOperation.retrieveTasks(false);*/
-
         }
         else if (ACTION_DISMISS_NOTIFICATION.equals(action)) {
             ReminderManager.cancelNotification(context,rowId);

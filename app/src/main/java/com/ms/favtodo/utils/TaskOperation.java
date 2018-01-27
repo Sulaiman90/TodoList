@@ -204,17 +204,16 @@ public class TaskOperation {
                         TaskDetails tasks = (TaskDetails) parent.getItemAtPosition(position);
                         Intent intent = new Intent(mContext, NewTask.class);
                         Bundle bundle = new Bundle();
-                        bundle.putString("title", tasks.getTitle());
+                        bundle.putInt("id", tasks.getTaskId());
                        // Log.d(TAG,"Item:title "+tasks.getTitle() +" "+tasks.getDate());
                         //Log.d(TAG,"Item:ms "+tasks.getTaskDone() +" "+tasks.getDateInMilliSeconds());
-                        bundle.putInt("id", tasks.getTaskId());
+                      /*  bundle.putString("title", tasks.getTitle());
                         bundle.putString("date", tasks.getDate());
                         bundle.putString("time", tasks.getTime());
                         bundle.putInt("doneOrNot", tasks.getTaskDone());
                         bundle.putLong("timeInMs", tasks.getDateInMilliSeconds());
                         bundle.putInt("hour", tasks.getTaskHour());
-                        bundle.putInt("minute", tasks.getTaskMinute());
-
+                        bundle.putInt("minute", tasks.getTaskMinute());*/
                         intent.putExtras(bundle);
                         //mContext.startActivity(intent);
                         ((Activity) mContext).startActivityForResult(intent,MainActivity.TODO_REQUEST_CODE);
