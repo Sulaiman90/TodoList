@@ -148,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         manager.registerReceiver((broadcastReceiver),new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
         super.onResume();
+        loadTasks();
         //Log.d(TAG,"onResume");
 
     }

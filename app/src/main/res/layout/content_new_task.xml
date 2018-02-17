@@ -149,7 +149,7 @@
                 android:id="@+id/enableSound_cb"
                 android:layout_below="@+id/alert_label"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-                android:text="Enable Sound"/>
+                android:text="Enable sound"/>
 
             <Switch
                 android:layout_width="wrap_content"
@@ -171,7 +171,7 @@
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:enabled="false"
                 android:layout_marginTop="8dp"
-                android:text="Change Sound"/>
+                android:text="Change sound"/>
 
 
         </RelativeLayout>

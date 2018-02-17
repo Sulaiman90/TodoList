@@ -17,4 +17,10 @@
 
     <dimen name="listItem_top_padding">3dp</dimen>
     <dimen name="listItem_left_padding">6dp</dimen>
+
+    <dimen name="view_5_dp">5dp</dimen>
+    <dimen name="view_10_dp">10dp</dimen>
+    <dimen name="view_15_dp">15dp</dimen>
+    <dimen name="view_20_dp">20dp</dimen>
+    <dimen name="view_30_dp">30dp</dimen>
 </resources>

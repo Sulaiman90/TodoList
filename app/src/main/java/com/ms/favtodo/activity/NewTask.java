@@ -138,7 +138,8 @@ public class NewTask extends AppCompatActivity {
             notificationSound = PreferenceUtils.getNotificationSound(this);
             mSoundCheckBox.setChecked(PreferenceUtils.isSoundEnabled(this));
             mVibrateSwitch.setChecked(PreferenceUtils.isVibrateEnabled(this));
-        } else {
+        }
+        else {
             getSupportActionBar().setTitle("");
             Bundle extras = getIntent().getExtras();
             taskId  = extras.getInt("id");
@@ -175,6 +176,15 @@ public class NewTask extends AppCompatActivity {
 
             //Log.d(TAG,"Title " +extras.getString("title") + " Date " + extras.getString("date") +" time "+timeText);
 
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(dateInMillis);
+
+            mCalendar.set(Calendar.YEAR, cal.get(Calendar.YEAR));
+            mCalendar.set(Calendar.MONTH, cal.get(Calendar.MONTH));
+            mCalendar.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
+            mCalendar.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+            mCalendar.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+
             if (dateText.matches("")) {
                 showHideButtons(mClearDate, false);
                 mTimeLayout.setVisibility(View.GONE);
@@ -194,6 +204,12 @@ public class NewTask extends AppCompatActivity {
         }
 
         mChooseSoundButton.setEnabled(mSoundCheckBox.isChecked());
+        if(mSoundCheckBox.isChecked()){
+            mChooseSoundButton.setTextColor(getResources().getColor(R.color.black));
+        }
+        else{
+            mChooseSoundButton.setTextColor(getResources().getColor(R.color.grey));
+        }
 
         mTitleText.setOnClickListener(new OnClickListener() {
             @Override
@@ -242,7 +258,6 @@ public class NewTask extends AppCompatActivity {
         mClearDate.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // mClearDate.setVisibility(View.GONE);
                 showHideButtons(mClearDate, false);
                 showHideButtons(mClearTime, false);
                 mTimeLayout.setVisibility(View.GONE);
@@ -267,6 +282,12 @@ public class NewTask extends AppCompatActivity {
     @OnClick(R.id.enableSound_cb)
     void enableChangeSoundButton(){
         mChooseSoundButton.setEnabled(mSoundCheckBox.isChecked());
+        if(mSoundCheckBox.isChecked()){
+            mChooseSoundButton.setTextColor(getResources().getColor(R.color.black));
+        }
+        else{
+            mChooseSoundButton.setTextColor(getResources().getColor(R.color.grey));
+        }
     }
 
     @OnClick(R.id.choose_alarm_sound)
@@ -367,11 +388,9 @@ public class NewTask extends AppCompatActivity {
                 todoFinished = 0;
             }
             //Toast.makeText(getApplicationContext(),todoDateAndTime,Toast.LENGTH_LONG).show();
-             Log.d(TAG,"time "+todoDateAndTime +" "+dateInMillis);
-             Log.d(TAG, "date & time "+ todoTitle + todoDate + " " + todoTime);
+           //  Log.d(TAG,"time "+todoDateAndTime +" "+dateInMillis);
+            // Log.d(TAG, "date & time "+ todoTitle + todoDate + " " + todoTime);
            //  Log.d(TAG, "taskHour " + taskHour + " taskMinute " + taskMinute);
-
-           // TaskOperation.showDebugToast(this,dateInMillis+"");
 
             if(mVibrateSwitch.isChecked()){
                 vibrateEnabled = 1;
@@ -404,16 +423,26 @@ public class NewTask extends AppCompatActivity {
             Calendar now = Calendar.getInstance();
 
             //TaskOperation.showDebugToast(this,mCalendar.getTimeInMillis() + " " +now.getTimeInMillis());
-            //Log.d(TAG,mCalendar.getTimeInMillis() + " " + now.getTimeInMillis());
+            Log.d(TAG,"mCalendar "+mCalendar.getTimeInMillis() + " now " + now.getTimeInMillis());
+            //Log.d(TAG,"newTask "+newTask);
+            //Log.d(TAG,"dateText "+dateText);
+            Log.d(TAG,"dateInMillis "+dateInMillis + " " + now.getTimeInMillis());
 
-            if (!dateText.matches("") && mCalendar.getTimeInMillis() > now.getTimeInMillis() ) {
-                if (newTask) {
+            if (!dateText.matches("") ) {
+                //Log.d(TAG,"dateText not empty ");
+                if (newTask && mCalendar.getTimeInMillis() > now.getTimeInMillis() ) {
                     ReminderManager.scheduleReminder(mCalendar,this,rowId,todoTitle);
                 }
-                else{
-                    ReminderManager.cancelReminder(this,taskId);
-                    if(todoFinished==0){
+                else if (!newTask) {
+                    Log.d(TAG,"else  ");
+                    if(todoFinished==0  && (dateInMillis > now.getTimeInMillis() )){
+                        Log.d(TAG,"in  ");
+                        ReminderManager.cancelReminder(this,taskId);
                         ReminderManager.scheduleReminder(mCalendar,this,taskId,todoTitle);
+                        //Log.d(TAG,"cancelled and scheduled ");
+                    }
+                    else if(todoFinished==1){
+                        ReminderManager.cancelReminder(this,taskId);
                     }
                 }
             }
@@ -452,6 +481,7 @@ public class NewTask extends AppCompatActivity {
             toastobject.show();
             Intent intent = new Intent();
             setResult(RESULT_OK,intent);
+            ReminderManager.cancelReminder(this,taskId);
             finish();
         }
         else{

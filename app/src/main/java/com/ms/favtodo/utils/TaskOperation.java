@@ -94,8 +94,8 @@ public class TaskOperation {
                     task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
                     task.setDateAndTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_AND_TIME)));
 
-                   Log.d(TAG,"Title "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE))
-                            + " date "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_IN_MS)));
+                 /*  Log.d(TAG,"Title "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE))
+                            + " date "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_IN_MS)));*/
 
                     task.setDate(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));
                     task.setTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME)));
@@ -112,9 +112,9 @@ public class TaskOperation {
                         noDateTasks.add(task);
                     }
                     else if(isPassed(date,task.getTaskHour(),task.getTaskMinute())){
-                       showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
-                        Log.d(TAG,"isToday "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
-                        Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
+                       // showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
+                       // Log.d(TAG,"isToday "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
+                       // Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
                         overdueTasks.add(task);
                     }
                     else if(DateUtils.isToday(date)){
@@ -207,15 +207,7 @@ public class TaskOperation {
                         bundle.putInt("id", tasks.getTaskId());
                        // Log.d(TAG,"Item:title "+tasks.getTitle() +" "+tasks.getDate());
                         //Log.d(TAG,"Item:ms "+tasks.getTaskDone() +" "+tasks.getDateInMilliSeconds());
-                      /*  bundle.putString("title", tasks.getTitle());
-                        bundle.putString("date", tasks.getDate());
-                        bundle.putString("time", tasks.getTime());
-                        bundle.putInt("doneOrNot", tasks.getTaskDone());
-                        bundle.putLong("timeInMs", tasks.getDateInMilliSeconds());
-                        bundle.putInt("hour", tasks.getTaskHour());
-                        bundle.putInt("minute", tasks.getTaskMinute());*/
                         intent.putExtras(bundle);
-                        //mContext.startActivity(intent);
                         ((Activity) mContext).startActivityForResult(intent,MainActivity.TODO_REQUEST_CODE);
                     }
                 }

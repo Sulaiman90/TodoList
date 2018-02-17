@@ -20,8 +20,8 @@ public class ReminderManager {
 
     public static void scheduleReminder(Calendar when, Context context, long taskId, String title){
 
-        TaskOperation.showDebugToast(context,"scheduleReminder");
-        //Log.d(TAG,"scheduleReminder");
+        //TaskOperation.showDebugToast(context,"scheduleReminder");
+        Log.d(TAG,"scheduleReminder");
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         Intent i = new Intent(context, AlarmReceiver.class);
@@ -33,6 +33,7 @@ public class ReminderManager {
     }
 
     public static void cancelReminder(Context context,long taskId){
+        Log.d(TAG, "cancelReminder");
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);

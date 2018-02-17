@@ -6,9 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.content.ContextCompat;
@@ -21,10 +22,6 @@ import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.model.TaskDetails;
 import com.ms.favtodo.sync.ReminderTasks;
 import com.ms.favtodo.sync.TaskReminderIntentService;
-
-/**
- * Created by MOHAMED SULAIMAN on 16-09-2017.
- */
 
 public class NotificationUtils {
     private static final String TAG = NotificationUtils.class.getSimpleName();
@@ -44,29 +41,32 @@ public class NotificationUtils {
 
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
-        Notification notification = notificationBuilder.build();
-        //notification.flags = Notification.FLAG_INSISTENT;
-
         TaskDbHelper dbHelper = new TaskDbHelper(context);
         Cursor c1 =  dbHelper.fetchTask(rowId);
 
-        boolean soundEnabled = false;
+        if(c1.getCount() == 0 || c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.TASK_DONE)) == 1){
+            return;
+        }
 
+       /* boolean soundEnabled = false;
         if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND_ENABLED)) == 1){
             soundEnabled = true;
         }
-
         Uri notificationSound = Uri.parse(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND)));
-       // notificationSound = Uri.parse(PreferenceUtils.getNotificationSound(context));
-        Log.d(TAG, notificationSound.toString());
+        Log.d(TAG, notificationSound.toString());*/
 
-        if(soundEnabled){
+        Notification notification = notificationBuilder.build();
+
+      /*  if(soundEnabled){
             notification.sound = notificationSound;
         }
         if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1){
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
+            *//*notification.defaults |= Notification.DEFAULT_VIBRATE;
+            notification.vibrate = pattern;*//*
+            Vibrator vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(5000);
         }
-
+*/
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -78,39 +78,18 @@ public class NotificationUtils {
         //Log.e(TAG,"rowId "+rowId);
         Intent startActivityIntent = new Intent(context, NewTask.class);
 
-       /* TaskDbHelper dbHelper = new TaskDbHelper(context);
-        Cursor c1 =  dbHelper.fetchTask(rowId);
-        TaskDetails task = new TaskDetails();
-        task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));*/
-
-    /*    task.setTitle(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
-        task.setDateAndTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE_AND_TIME)));
-        task.setDate(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE)));
-        task.setTime(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME)));
-        task.setTaskDone(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.TASK_DONE)));
-        task.setDateInMilliSeconds(c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS)));
-        task.setTaskHour(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR)));
-        task.setTaskMinute(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE)));
-
-        startActivityIntent.putExtra("title", task.getTitle());
-        startActivityIntent.putExtra("date", task.getDate());
-        startActivityIntent.putExtra("time", task.getTime());
-        startActivityIntent.putExtra("doneOrNot", task.getTaskDone());
-        startActivityIntent.putExtra("timeInMs", task.getDateInMilliSeconds());
-        startActivityIntent.putExtra("hour", task.getTaskHour());
-        startActivityIntent.putExtra("minute", task.getTaskMinute());*/
-
-        startActivityIntent.putExtra("id", rowId);
-        startActivityIntent.putExtra("TaskRowId",rowId);
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", (int)rowId);
+        startActivityIntent.putExtras(bundle);
 
         return PendingIntent.getActivity(
-                context,
-                (int)rowId,
+                context ,
+                (int)rowId ,
                 startActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public static Action taskCompletedAction(Context context, long rowID){
+    private static Action taskCompletedAction(Context context, long rowID){
         Intent launchIntent = new Intent(context, TaskReminderIntentService.class);
         launchIntent.setAction(ReminderTasks.ACTION_TASK_COMPLETED);
         launchIntent.putExtra("taskRowId",rowID);
@@ -125,7 +104,7 @@ public class NotificationUtils {
         return taskDoneAction;
     }
 
-    public static Action ignoreReminderAction(Context context, long rowID){
+    private static Action ignoreReminderAction(Context context, long rowID){
         Intent ignoreReminderIntent = new Intent(context, TaskReminderIntentService.class);
         ignoreReminderIntent.setAction(ReminderTasks.ACTION_DISMISS_NOTIFICATION);
         ignoreReminderIntent.putExtra("taskRowId",rowID);
@@ -138,6 +117,5 @@ public class NotificationUtils {
                 pendingIntent);
         return ignoreReminderAction;
     }
-
 }
 

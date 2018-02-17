@@ -16,6 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.activity.AlertActivity;
 import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
@@ -40,6 +41,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             long rowId =  b.getLong("TaskRowId");
 
             NotificationUtils.createNotification(context,taskTitle,rowId);
+
+            Intent newIntent = new Intent(context, AlertActivity.class);
+            newIntent.putExtras(b);
+            newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(newIntent);
         }
     }
 }
