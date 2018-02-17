@@ -48,25 +48,8 @@ public class NotificationUtils {
             return;
         }
 
-       /* boolean soundEnabled = false;
-        if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND_ENABLED)) == 1){
-            soundEnabled = true;
-        }
-        Uri notificationSound = Uri.parse(c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND)));
-        Log.d(TAG, notificationSound.toString());*/
-
         Notification notification = notificationBuilder.build();
 
-      /*  if(soundEnabled){
-            notification.sound = notificationSound;
-        }
-        if(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1){
-            *//*notification.defaults |= Notification.DEFAULT_VIBRATE;
-            notification.vibrate = pattern;*//*
-            Vibrator vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(5000);
-        }
-*/
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 

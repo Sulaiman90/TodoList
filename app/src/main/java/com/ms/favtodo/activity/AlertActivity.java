@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
@@ -41,11 +42,14 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mVibrate;
     private final long[] mVibratePattern = { 0, 500, 500 ,500, 500 };
     private Button mDismissButton;
+    @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert);
+
+        ButterKnife.bind(this);
 
         Window window = this.getWindow();
 
@@ -90,6 +94,11 @@ public class AlertActivity extends AppCompatActivity {
         });
     }
 
+    @OnClick(R.id.iv_alert_silence)
+    public void silenceBtnClick(){
+        stopSound();
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -104,6 +113,7 @@ public class AlertActivity extends AppCompatActivity {
 
         if(mMediaPlayer == null){
             mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -126,12 +136,13 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     private void stopSound() {
-      /*  if (mMediaPlayer != null) {
+        if(mVibrator != null){
+            mVibrator.cancel();
+        }
+        if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
             mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }*/
-        cleanup();
+            //mMediaPlayer.reset();
+        }
     }
 
     @Override
