@@ -28,8 +28,11 @@ import android.widget.ImageView;
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
+import com.ms.favtodo.utils.NotificationUtils;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +48,11 @@ public class AlertActivity extends AppCompatActivity {
     private final long[] mVibratePattern = { 0, 500, 500 ,500, 500 };
     private Button mDismissButton;
     private boolean mSoundOn = true;;
+    private Timer mTimer = null;
+    private PlayTimerTask mTimerTask;
+    private long mPlayTime = 20 * 1000;
+    private Intent mIntent;
+
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
 
     @Override
@@ -75,8 +83,20 @@ public class AlertActivity extends AppCompatActivity {
 
         mDismissButton = findViewById(R.id.btn_dismiss);
 
-        Intent intent = getIntent();
-        Bundle b = intent.getExtras();
+        mDismissButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        start(getIntent());
+    }
+
+    private void start(Intent intent){
+
+        mIntent = intent;
+        Bundle b = mIntent.getExtras();
         long rowId = 0;
         if (b != null) {
             rowId = b.getLong("TaskRowId");
@@ -96,15 +116,12 @@ public class AlertActivity extends AppCompatActivity {
         if (mVibrate)
             mVibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
-        startSound(notificationSound);
+        mTimerTask = new PlayTimerTask();
+        mTimer = new Timer();
+        mTimer.schedule(mTimerTask, mPlayTime);
 
-        mDismissButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cleanup();
-                finish();
-            }
-        });
+        startPlayingSoundAndVibrate(notificationSound);
+
     }
 
     @OnClick(R.id.iv_alert_silence)
@@ -126,7 +143,7 @@ public class AlertActivity extends AppCompatActivity {
         //super.onBackPressed();
     }
 
-    private void startSound(String uriString){
+    private void startPlayingSoundAndVibrate(String uriString){
         Uri soundUri = Uri.parse(uriString);
 
         if (mVibrate)
@@ -134,7 +151,7 @@ public class AlertActivity extends AppCompatActivity {
 
         if(mMediaPlayer == null){
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setLooping(true);
+            //mMediaPlayer.setLooping(true);
             mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -176,12 +193,14 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         cleanup();
     }
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause");
         super.onPause();
         finish();
     }
@@ -194,6 +213,23 @@ public class AlertActivity extends AppCompatActivity {
             mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
+        }
+    }
+
+    private void addNotification(){
+        Bundle b = mIntent.getExtras();
+        String taskTitle = b.getString("TaskTitle");
+        long rowId =  b.getLong("TaskRowId");
+
+        NotificationUtils.createNotification(this,taskTitle,rowId);
+    }
+
+    private class PlayTimerTask extends TimerTask{
+
+        @Override
+        public void run() {
+            addNotification();
+            finish();
         }
     }
 }

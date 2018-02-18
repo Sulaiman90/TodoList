@@ -40,7 +40,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             String taskTitle = b.getString("TaskTitle");
             long rowId =  b.getLong("TaskRowId");
 
-            NotificationUtils.createNotification(context,taskTitle,rowId);
+           // NotificationUtils.createNotification(context,taskTitle,rowId);
 
             Intent newIntent = new Intent(context, AlertActivity.class);
             newIntent.putExtras(b);
