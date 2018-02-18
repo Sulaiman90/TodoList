@@ -50,6 +50,14 @@
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:background">@color/colorPrimary</item>
     </style>
-    
+
+    <style name="TitleStyle">
+        <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Medium</item>
+
+    </style>
+
+    <style name="TitleStyle.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
 
 </resources>

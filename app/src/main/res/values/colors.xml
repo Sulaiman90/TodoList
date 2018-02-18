@@ -23,6 +23,12 @@
 
     <color name="floating_btn">#4CAF50</color>
 
+    <color name="white_30_alpha">#4cffffff</color>
+    <color name="white_60_alpha">#99ffffff</color>
+    <color name="white_80_alpha">#c8ffffff</color>
+    <color name="colorDisabled">#1a000000</color>
+    <color name="black_40_alpha">#64000000</color>
+    <color name="black_60_alpha">#99000000</color>
+    <color name="red_semi_transp">#aaff0000</color>
     <!--7C4DFF-->
-
 </resources>

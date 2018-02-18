@@ -68,5 +68,11 @@
     <string name="pref_notification_vibrate_title">Vibrate</string>
     <string name="pref_notification_vibrate_summary">Vibrate on notification</string>
 
+    <string name="paid">Paid</string>
+    <string name="bold">bold</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="edit">Edit</string>
+    <string name="snooze">Snooze</string>
+
 </resources>
 

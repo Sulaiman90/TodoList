@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -21,6 +22,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.ms.favtodo.R;
@@ -42,6 +44,7 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mVibrate;
     private final long[] mVibratePattern = { 0, 500, 500 ,500, 500 };
     private Button mDismissButton;
+    private boolean mSoundOn = true;;
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
 
     @Override
@@ -53,7 +56,17 @@ public class AlertActivity extends AppCompatActivity {
 
         Window window = this.getWindow();
 
-        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        FrameLayout statusbar = findViewById(R.id.statusbar);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.BLACK);
+
+        }
+        else {
+            statusbar.setVisibility(View.VISIBLE);
+            window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
@@ -96,7 +109,15 @@ public class AlertActivity extends AppCompatActivity {
 
     @OnClick(R.id.iv_alert_silence)
     public void silenceBtnClick(){
-        stopSound();
+        mSoundOn = !mSoundOn;
+        if(mSoundOn){
+            mIvSilence.setImageResource(R.drawable.ic_mute_off);
+            resumeSound();
+        }
+        else{
+            mIvSilence.setImageResource(R.drawable.ic_mute_on);
+            pauseSound();
+        }
     }
 
 
@@ -135,13 +156,21 @@ public class AlertActivity extends AppCompatActivity {
         }
     }
 
-    private void stopSound() {
+    private void pauseSound() {
         if(mVibrator != null){
             mVibrator.cancel();
         }
         if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
-            mMediaPlayer.stop();
-            //mMediaPlayer.reset();
+            mMediaPlayer.pause();
+        }
+    }
+
+    private void resumeSound() {
+        if(mVibrator != null && mVibrate){
+            mVibrator.vibrate(mVibratePattern,0);
+        }
+        if(mMediaPlayer != null){
+            mMediaPlayer.start();
         }
     }
 
