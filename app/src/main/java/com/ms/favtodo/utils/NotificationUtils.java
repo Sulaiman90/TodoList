@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.activity.AlertActivity;
 import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
@@ -26,27 +27,29 @@ import com.ms.favtodo.sync.TaskReminderIntentService;
 public class NotificationUtils {
     private static final String TAG = NotificationUtils.class.getSimpleName();
 
-    public static void createNotification(Context context,String TaskTitle,long rowId){
+    public static void createNotification(Context context,long rowId){
        // Log.d(TAG,"createNotification "+alarmSound);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                .setContentTitle(TaskTitle)
-                .setContentText(context.getString(R.string.app_name))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.app_name)))
-                .setSmallIcon(R.drawable.ic_done_white_24dp)
-                .setContentIntent(contentIntent(context,rowId))
-                .addAction(taskCompletedAction(context,rowId))
-                .addAction(ignoreReminderAction(context,rowId))
-                .setAutoCancel(true);
-
-        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-
         TaskDbHelper dbHelper = new TaskDbHelper(context);
         Cursor c1 =  dbHelper.fetchTask(rowId);
 
         if(c1.getCount() == 0 || c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.TASK_DONE)) == 1){
             return;
         }
+
+        String taskTitle = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE));
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setContentTitle(taskTitle)
+                .setContentText(context.getString(R.string.app_name))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.app_name)))
+                .setSmallIcon(R.drawable.ic_done_white_24dp)
+                .setContentIntent(contentIntent(context,rowId))
+                //.addAction(taskCompletedAction(context,rowId))
+                //.addAction(ignoreReminderAction(context,rowId))
+                .setAutoCancel(true);
+
+        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
         Notification notification = notificationBuilder.build();
 
@@ -59,10 +62,11 @@ public class NotificationUtils {
 
     private static PendingIntent contentIntent(Context context, long rowId) {
         //Log.e(TAG,"rowId "+rowId);
-        Intent startActivityIntent = new Intent(context, NewTask.class);
+        Intent startActivityIntent = new Intent(context, AlertActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putInt("id", (int)rowId);
+        bundle.putLong(NewTask.TASK_ID, rowId);
+        bundle.putBoolean(NewTask.PLAY_SOUND, false);
         startActivityIntent.putExtras(bundle);
 
         return PendingIntent.getActivity(

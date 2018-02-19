@@ -204,7 +204,7 @@ public class TaskOperation {
                         TaskDetails tasks = (TaskDetails) parent.getItemAtPosition(position);
                         Intent intent = new Intent(mContext, NewTask.class);
                         Bundle bundle = new Bundle();
-                        bundle.putInt("id", tasks.getTaskId());
+                        bundle.putInt(NewTask.TASK_ID, tasks.getTaskId());
                        // Log.d(TAG,"Item:title "+tasks.getTitle() +" "+tasks.getDate());
                         //Log.d(TAG,"Item:ms "+tasks.getTaskDone() +" "+tasks.getDateInMilliSeconds());
                         intent.putExtras(bundle);

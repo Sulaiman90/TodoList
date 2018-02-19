@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.receiver.AlarmReceiver;
@@ -25,8 +26,7 @@ public class ReminderManager {
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         Intent i = new Intent(context, AlarmReceiver.class);
-        i.putExtra("TaskTitle", title);
-        i.putExtra("TaskRowId", taskId);
+        i.putExtra(NewTask.TASK_ID, taskId);
 
         PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_ONE_SHOT);
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);

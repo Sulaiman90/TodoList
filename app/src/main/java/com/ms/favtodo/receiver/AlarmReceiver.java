@@ -37,13 +37,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent != null) {
             Bundle b = intent.getExtras();
-            String taskTitle = b.getString("TaskTitle");
-            long rowId =  b.getLong("TaskRowId");
-
-           // NotificationUtils.createNotification(context,taskTitle,rowId);
-
             Intent newIntent = new Intent(context, AlertActivity.class);
-            newIntent.putExtras(b);
+            if (b != null) {
+                b.putBoolean(NewTask.PLAY_SOUND, true);
+                newIntent.putExtras(b);
+            }
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(newIntent);
         }

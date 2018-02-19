@@ -24,10 +24,13 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
+import com.ms.favtodo.sync.ReminderTasks;
+import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.NotificationUtils;
 
 import java.io.IOException;
@@ -51,9 +54,12 @@ public class AlertActivity extends AppCompatActivity {
     private Timer mTimer = null;
     private PlayTimerTask mTimerTask;
     private long mPlayTime = 20 * 1000;
-    private Intent mIntent;
+    private boolean showNotification = true;
+    private long taskId;
 
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
+    @BindView(R.id.tv_alert_time) TextView mTvDateAndTime;
+    @BindView(R.id.tv_alert_title) TextView mTvTaskTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +92,7 @@ public class AlertActivity extends AppCompatActivity {
         mDismissButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                showNotification = false;
                 finish();
             }
         });
@@ -93,35 +100,61 @@ public class AlertActivity extends AppCompatActivity {
         start(getIntent());
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, " onNewIntent ");
+        cleanup();
+        start(intent);
+    }
+
     private void start(Intent intent){
 
-        mIntent = intent;
-        Bundle b = mIntent.getExtras();
-        long rowId = 0;
+        Bundle b = intent.getExtras();
+        boolean playSound = false;
         if (b != null) {
-            rowId = b.getLong("TaskRowId");
+            taskId = b.getLong(NewTask.TASK_ID);
+            playSound = b.getBoolean(NewTask.PLAY_SOUND);
         }
 
+        Log.d(TAG, " taskId "+taskId);
+
         TaskDbHelper dbHelper = new TaskDbHelper(this);
-        Cursor c1 =  dbHelper.fetchTask(rowId);
+        Cursor c1 =  dbHelper.fetchTask(taskId);
 
-        String notificationSound;
-        notificationSound = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND));
+        String date = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE));
+        String time = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TIME));
+        String title =  c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE));
 
-        if (c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1)
-            mVibrate = true;
-        else mVibrate = false;
+        String dateTime = String.format(getResources().getString(R.string.dateAndTime),date, time);
 
-        Log.d(TAG, notificationSound +" mVibrate "+mVibrate);
-        if (mVibrate)
+        mTvDateAndTime.setText(dateTime);
+        mTvTaskTitle.setText(title);
+
+        if(!playSound){
+            mIvSilence.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        boolean soundEnabled = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND_ENABLED)) == 1;
+
+        mVibrate = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1;
+
+        Log.d(TAG, "soundEnabled "+soundEnabled +" mVibrate "+mVibrate);
+
+        if (mVibrate){
             mVibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+            startVibrate();
+        }
+
+        if(soundEnabled){
+            String notificationSound = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_SOUND));
+            startPlayingSound(notificationSound);
+        }
 
         mTimerTask = new PlayTimerTask();
         mTimer = new Timer();
         mTimer.schedule(mTimerTask, mPlayTime);
-
-        startPlayingSoundAndVibrate(notificationSound);
-
     }
 
     @OnClick(R.id.iv_alert_silence)
@@ -137,24 +170,42 @@ public class AlertActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public void onBackPressed() {
-        //super.onBackPressed();
+    @OnClick(R.id.btn_complete)
+    public void taskCompleted(){
+        Intent launchIntent = new Intent(this, TaskReminderIntentService.class);
+        launchIntent.setAction(ReminderTasks.ACTION_TASK_COMPLETED);
+        launchIntent.putExtra(NewTask.TASK_ID,taskId);
+        startService(launchIntent);
+        Log.d(TAG, "taskCompleted");
+        showNotification = false;
+        finish();
     }
 
-    private void startPlayingSoundAndVibrate(String uriString){
-        Uri soundUri = Uri.parse(uriString);
+    @OnClick(R.id.btn_edit)
+    public void editTask(){
+        showNotification = false;
+        Intent intent = new Intent(this, NewTask.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt(NewTask.TASK_ID,(int) taskId);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 
-        if (mVibrate)
-            mVibrator.vibrate(mVibratePattern,0);
+
+    private void startVibrate(){
+        mVibrator.vibrate(mVibratePattern,0);
+    }
+
+    private void startPlayingSound(String uriString){
+        Uri soundUri = Uri.parse(uriString);
 
         if(mMediaPlayer == null){
             mMediaPlayer = new MediaPlayer();
-            //mMediaPlayer.setLooping(true);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
+                    Log.d(TAG, "onPrepared");
                     mp.start();
                 }
             });
@@ -196,6 +247,9 @@ public class AlertActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
         cleanup();
+        if(showNotification){
+            addNotification();
+        }
     }
 
     @Override
@@ -205,7 +259,13 @@ public class AlertActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
+
     private void cleanup() {
+        Log.d(TAG, "cleanup");
         if(mVibrator != null){
             mVibrator.cancel();
         }
@@ -214,20 +274,20 @@ public class AlertActivity extends AppCompatActivity {
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
     }
 
     private void addNotification(){
-        Bundle b = mIntent.getExtras();
-        String taskTitle = b.getString("TaskTitle");
-        long rowId =  b.getLong("TaskRowId");
-
-        NotificationUtils.createNotification(this,taskTitle,rowId);
+        NotificationUtils.createNotification(this,taskId);
     }
 
     private class PlayTimerTask extends TimerTask{
 
         @Override
         public void run() {
+            Log.d(TAG, "run");
             addNotification();
             finish();
         }

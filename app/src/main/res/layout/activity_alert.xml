@@ -45,13 +45,13 @@
             android:layout_toLeftOf="@id/iv_alert_silence"
             android:layout_toRightOf="@id/iv_alert_category"
             android:layout_centerInParent="true"
-            android:text="Sample"
+            android:text="Date And Time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:gravity="center_horizontal"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:textSize="16sp"
            />
          </RelativeLayout>
 
@@ -90,6 +90,7 @@
         android:background="@color/black_40_alpha"
         android:paddingBottom="@dimen/view_3_6_dp"
         android:minLines="2"
+        android:ellipsize="end"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
         android:gravity="center"
         android:textStyle="bold"
@@ -118,6 +119,7 @@
                 android:layout_weight="1.0"
                 android:background="@drawable/bt_alert_selector"
                 android:text="Edit"
+                android:id="@+id/btn_edit"
                 android:textAllCaps="false"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:textColor="@color/white_80_alpha"/>
@@ -137,6 +139,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:id="@+id/btn_complete"
             android:text="Complete"
             android:textStyle="bold"
             android:textAllCaps="false"

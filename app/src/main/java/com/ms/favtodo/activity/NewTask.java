@@ -90,6 +90,9 @@ public class NewTask extends AppCompatActivity {
     private String notificationSound = "";
     private TaskDetails task;
 
+    public static String TASK_ID = "taskId";
+    public static String PLAY_SOUND = "playSound";
+
     @BindView(R.id.enableVibrate_switch) Switch mVibrateSwitch;
     @BindView(R.id.enableSound_cb) CheckBox mSoundCheckBox;
     @BindView(R.id.choose_alarm_sound) Button mChooseSoundButton;
@@ -142,7 +145,7 @@ public class NewTask extends AppCompatActivity {
         else {
             getSupportActionBar().setTitle("");
             Bundle extras = getIntent().getExtras();
-            taskId  = extras.getInt("id");
+            taskId  = extras.getInt(NewTask.TASK_ID);
 
             Cursor c1 =  dbHelper.fetchTask(taskId);
 
@@ -434,9 +437,9 @@ public class NewTask extends AppCompatActivity {
                     ReminderManager.scheduleReminder(mCalendar,this,rowId,todoTitle);
                 }
                 else if (!newTask) {
-                    Log.d(TAG,"else  ");
+                    //Log.d(TAG,"else  ");
                     if(todoFinished==0  && (dateInMillis > now.getTimeInMillis() )){
-                        Log.d(TAG,"in  ");
+                      //  Log.d(TAG,"in  ");
                         ReminderManager.cancelReminder(this,taskId);
                         ReminderManager.scheduleReminder(mCalendar,this,taskId,todoTitle);
                         //Log.d(TAG,"cancelled and scheduled ");
