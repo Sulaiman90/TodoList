@@ -129,6 +129,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1.0"
                 android:text="Snooze"
+                android:id="@+id/btn_snooze"
                 android:textAllCaps="false"
                 android:textColor="@color/white_80_alpha"
                 android:background="@drawable/bt_alert_selector"

@@ -1,6 +1,9 @@
 package com.ms.favtodo.activity;
 
 import android.app.ActionBar;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -25,15 +28,21 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.db.TaskContract;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
+import com.ms.favtodo.receiver.AlarmReceiver;
 import com.ms.favtodo.sync.ReminderTasks;
 import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.NotificationUtils;
+import com.ms.favtodo.utils.ReminderManager;
+import com.ms.favtodo.utils.TaskOperation;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +65,8 @@ public class AlertActivity extends AppCompatActivity {
     private long mPlayTime = 20 * 1000;
     private boolean showNotification = true;
     private long taskId;
+    private boolean mSnooze = true;
+    private TaskDbHelper dbHelper;
 
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
     @BindView(R.id.tv_alert_time) TextView mTvDateAndTime;
@@ -97,6 +108,8 @@ public class AlertActivity extends AppCompatActivity {
             }
         });
 
+        dbHelper = new TaskDbHelper(this);
+
         start(getIntent());
     }
 
@@ -104,11 +117,12 @@ public class AlertActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, " onNewIntent ");
-        cleanup();
-        start(intent);
+       // cleanup();
+       // start(intent);
     }
 
     private void start(Intent intent){
+        Log.d(TAG, " start ");
 
         Bundle b = intent.getExtras();
         boolean playSound = false;
@@ -116,10 +130,11 @@ public class AlertActivity extends AppCompatActivity {
             taskId = b.getLong(NewTask.TASK_ID);
             playSound = b.getBoolean(NewTask.PLAY_SOUND);
         }
+        mSnooze = playSound;
 
-        Log.d(TAG, " taskId "+taskId);
+        Log.d(TAG, " taskId "+taskId + " mSnooze "+mSnooze);
 
-        TaskDbHelper dbHelper = new TaskDbHelper(this);
+
         Cursor c1 =  dbHelper.fetchTask(taskId);
 
         String date = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_DATE));
@@ -131,8 +146,17 @@ public class AlertActivity extends AppCompatActivity {
         mTvDateAndTime.setText(dateTime);
         mTvTaskTitle.setText(title);
 
-        if(!playSound){
+        if(!mSnooze){
             mIvSilence.setVisibility(View.INVISIBLE);
+            ReminderManager.cancelReminder(this, taskId);
+            ContentValues cv = new ContentValues();
+            cv.put(TaskContract.TaskEntry.SNOOZE_ON , 0);
+            dbHelper.updateTask((int)taskId, cv);
+            Log.d(TAG,"cancelReminder");
+            if (mTimer != null) {
+               // Log.d(TAG,"timer cancelled");
+                mTimer.cancel();
+            }
             return;
         }
 
@@ -141,6 +165,10 @@ public class AlertActivity extends AppCompatActivity {
         mVibrate = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1;
 
         Log.d(TAG, "soundEnabled "+soundEnabled +" mVibrate "+mVibrate);
+
+        if(!soundEnabled && !mVibrate){
+            mIvSilence.setVisibility(View.INVISIBLE);
+        }
 
         if (mVibrate){
             mVibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
@@ -189,6 +217,43 @@ public class AlertActivity extends AppCompatActivity {
         bundle.putInt(NewTask.TASK_ID,(int) taskId);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.btn_snooze)
+    public void snoozeTask() {
+        showNotification = false;
+        mSnooze = true;
+        ContentValues cv = new ContentValues();
+        cv.put(TaskContract.TaskEntry.SNOOZE_ON , 1);
+        dbHelper.updateTask((int)taskId, cv);
+        snoozeAlarm();
+        finish();
+    }
+
+    private void snoozeAlarm(){
+        Log.d(TAG, "snoozeAlarm ");
+        int snoozeMinutes = 1;
+        final long snoozeTime = System.currentTimeMillis() + (1000 * 60 * snoozeMinutes);
+
+        final Calendar when = Calendar.getInstance();
+        when.setTimeInMillis(snoozeTime);
+
+        int hour = when.get(Calendar.HOUR_OF_DAY);
+        int minute = when.get(Calendar.MINUTE);
+
+        String timeString = TaskOperation.generateTime(hour,minute);
+
+        Log.d(TAG, "hour "+hour +" minute "+minute);
+        Toast.makeText(this, "Remind you again at " + timeString,Toast.LENGTH_SHORT).show();
+
+        AlarmManager mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(this, AlarmReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(this, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        pi.cancel();
+        if (mAlarmManager != null) {
+            mAlarmManager.cancel(pi);
+        }
+        ReminderManager.scheduleReminder(when, this, taskId);
     }
 
 
@@ -244,11 +309,17 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
         super.onDestroy();
         cleanup();
         if(showNotification){
             addNotification();
+            if(mSnooze){
+               snoozeAlarm();
+            }
+        }
+        else {
+            ReminderManager.cancelNotification(this, taskId);
         }
     }
 

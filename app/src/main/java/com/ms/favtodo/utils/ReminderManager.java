@@ -19,7 +19,7 @@ public class ReminderManager {
 
     private static final String TAG = "ReminderManager";
 
-    public static void scheduleReminder(Calendar when, Context context, long taskId, String title){
+    public static void scheduleReminder(Calendar when, Context context, long taskId){
 
         //TaskOperation.showDebugToast(context,"scheduleReminder");
         Log.d(TAG,"scheduleReminder");
@@ -38,8 +38,15 @@ public class ReminderManager {
         Intent i = new Intent(context, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
         pi.cancel();
-        mAlarmManager.cancel(pi);
+        if (mAlarmManager != null) {
+            mAlarmManager.cancel(pi);
+        }
         cancelNotification(context,taskId);
+    }
+
+    public static void snoozeReminder(Context context,long taskId){
+        Log.d(TAG, "snoozeReminder");
+
     }
 
     public static void cancelNotification(Context context,long notificationId){
@@ -77,7 +84,7 @@ public class ReminderManager {
                         mCalendar.set(Calendar.MINUTE, PreferenceUtils.getMinute(context));
 
                         cancelReminder(context,rowId);
-                        scheduleReminder(mCalendar,context,(long)rowId,title);
+                        scheduleReminder(mCalendar,context,(long)rowId);
                     }
                 }
                 while (c1.moveToNext());

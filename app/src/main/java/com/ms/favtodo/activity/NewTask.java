@@ -55,6 +55,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.ms.favtodo.utils.TaskOperation.generateTime;
+
 public class NewTask extends AppCompatActivity {
 
     private static final String TAG = "FavDo_NewTask";
@@ -434,14 +436,14 @@ public class NewTask extends AppCompatActivity {
             if (!dateText.matches("") ) {
                 //Log.d(TAG,"dateText not empty ");
                 if (newTask && mCalendar.getTimeInMillis() > now.getTimeInMillis() ) {
-                    ReminderManager.scheduleReminder(mCalendar,this,rowId,todoTitle);
+                    ReminderManager.scheduleReminder(mCalendar,this,rowId);
                 }
                 else if (!newTask) {
                     //Log.d(TAG,"else  ");
                     if(todoFinished==0  && (dateInMillis > now.getTimeInMillis() )){
                       //  Log.d(TAG,"in  ");
                         ReminderManager.cancelReminder(this,taskId);
-                        ReminderManager.scheduleReminder(mCalendar,this,taskId,todoTitle);
+                        ReminderManager.scheduleReminder(mCalendar,this,taskId);
                         //Log.d(TAG,"cancelled and scheduled ");
                     }
                     else if(todoFinished==1){
@@ -691,30 +693,7 @@ public class NewTask extends AppCompatActivity {
 
             dateInMillis = mCalendar.getTimeInMillis();
 
-            int hour = selectedHour;
-            int minutes = selectedMinute;
-            String timeSet;
-            if (hour > 12) {
-                hour -= 12;
-                timeSet = "PM";
-            } else if (hour == 0) {
-                hour += 12;
-                timeSet = "AM";
-            } else if (hour == 12){
-                timeSet = "PM";
-            }else{
-                timeSet = "AM";
-            }
-
-            String min;
-            if (minutes < 10)
-                min = "0" + minutes ;
-            else
-                min = String.valueOf(minutes);
-
-            String timeString;
-            //timeString = setTimeString(hourOfDay, minute);
-            timeString = hour +":"+min +" "+timeSet;
+            String timeString = TaskOperation.generateTime(selectedHour,selectedMinute);
             mTimeText.setText(timeString);
             timeText = timeString;
             showHideButtons(mClearTime, true);

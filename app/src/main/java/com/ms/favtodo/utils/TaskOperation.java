@@ -419,4 +419,29 @@ public class TaskOperation {
        // Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
+    public static String generateTime(int selectedHour, int selectedMinute){
+        int hour = selectedHour;
+        String timeSet;
+        if (hour > 12) {
+            hour -= 12;
+            timeSet = "PM";
+        } else if (hour == 0) {
+            hour += 12;
+            timeSet = "AM";
+        } else if (hour == 12){
+            timeSet = "PM";
+        }else{
+            timeSet = "AM";
+        }
+
+        String min;
+        if (selectedMinute < 10)
+            min = "0" + selectedMinute ;
+        else
+            min = String.valueOf(selectedMinute);
+
+        String timeString = hour +":"+min +" "+timeSet;
+        return timeString;
+    }
+
 }

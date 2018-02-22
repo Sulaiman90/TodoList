@@ -180,7 +180,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     timeString = hour +" "+timeSet;
                 }
 
-                TaskOperation.showDebugToast(getActivity(),timeString);
+                //TaskOperation.showDebugToast(getActivity(),timeString);
 
                 if(!timeString.equals(PreferenceUtils.getDueTime12HrFormat(getActivity()))){
                     prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
