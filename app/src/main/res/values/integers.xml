@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="alarm_duration_default">60</integer>
+    <integer name="alarm_duration_max">120</integer>
+    <integer name="alarm_duration_min">2</integer>
+
+    <integer name="snooze_duration_default">1</integer>
+    <integer name="snooze_duration_max">60</integer>
+    <integer name="snooze_duration_min">1</integer>
+</resources>

@@ -2,14 +2,11 @@ package com.ms.favtodo.db;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by MOHAMED SULAIMAN on 22-12-2016.
- */
 
 public class TaskContract {
 
     public static final String DATABASE_NAME = "Todo";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
 
     public class TaskEntry implements BaseColumns {
         public static final String TABLE_NAME = "tasks";
@@ -27,5 +24,6 @@ public class TaskContract {
         public static final String NOTIFICATION_VIBRATE = "vibrate";
         public static final String NOTIFICATION_SOUND_ENABLED = "soundEnabled";
         public static final String SNOOZE_ON = "snoozeOn";
+        public static final String TASK_REPEAT = "repeat";
     }
 }

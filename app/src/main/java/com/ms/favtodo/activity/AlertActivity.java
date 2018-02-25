@@ -38,6 +38,7 @@ import com.ms.favtodo.receiver.AlarmReceiver;
 import com.ms.favtodo.sync.ReminderTasks;
 import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.NotificationUtils;
+import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
 
@@ -62,7 +63,7 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mSoundOn = true;;
     private Timer mTimer = null;
     private PlayTimerTask mTimerTask;
-    private long mPlayTime = 20 * 1000;
+    private long mPlayTime;
     private boolean showNotification = true;
     private long taskId;
     private boolean mSnooze = true;
@@ -110,6 +111,8 @@ public class AlertActivity extends AppCompatActivity {
 
         dbHelper = new TaskDbHelper(this);
 
+        mPlayTime = PreferenceUtils.getAlertDuration(this) * 1000;
+
         start(getIntent());
     }
 
@@ -117,8 +120,6 @@ public class AlertActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, " onNewIntent ");
-       // cleanup();
-       // start(intent);
     }
 
     private void start(Intent intent){
@@ -231,8 +232,10 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     private void snoozeAlarm(){
-        Log.d(TAG, "snoozeAlarm ");
-        int snoozeMinutes = 1;
+        int snoozeMinutes = PreferenceUtils.getAutoSnoozeInterval(this);
+
+        Log.d(TAG, "snoozeAlarm:snoozeMinutes "+snoozeMinutes);
+
         final long snoozeTime = System.currentTimeMillis() + (1000 * 60 * snoozeMinutes);
 
         final Calendar when = Calendar.getInstance();
@@ -314,8 +317,10 @@ public class AlertActivity extends AppCompatActivity {
         cleanup();
         if(showNotification){
             addNotification();
-            if(mSnooze){
-               snoozeAlarm();
+            if(PreferenceUtils.isAutoSnoozeEnabled(this)) {
+                if (mSnooze) {
+                    snoozeAlarm();
+                }
             }
         }
         else {

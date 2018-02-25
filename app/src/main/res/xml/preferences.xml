@@ -1,36 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:asp="http://schemas.android.com/apk/res-auto">
 
- <PreferenceCategory android:title="@string/pref_title_notifications">
-     <Preference
-         android:key="@string/pref_due_time_key"
-         android:title="Default reminder Time"
-         android:defaultValue="18:00"
-         android:summary="Notifications for tasks without due times will appear at 6 PM "/>
+    <PreferenceCategory android:title="@string/pref_title_alert">
 
-     <SwitchPreference
-         android:key="@string/pref_enable_sound_key"
-         android:title="@string/pref_enable_sound_title"
-         android:defaultValue="false"
-         />
+         <Preference
+             android:key="@string/pref_due_time_key"
+             android:title="Default reminder Time"
+             android:defaultValue="18:00"
+             android:summary="Notifications for tasks without due times will appear at 6 PM "/>
 
-     <RingtonePreference
-         android:defaultValue="content://settings/system/notification_sound"
-         android:key="@string/pref_notification_sound_key"
-         android:title="@string/pref_notification_sound_title"
-         android:ringtoneType="all"
-         android:summary="@string/pref_notification_sound_summary"
-         android:showDefault="true"
-         android:showSilent="true"
-         android:dependency="@string/pref_enable_sound_key"
-         />
+        <SwitchPreference
+            android:key="@string/pref_notification_vibrate_key"
+            android:title="@string/pref_notification_vibrate_title"
+            android:summary="@string/pref_notification_vibrate_summary"
+            android:defaultValue="false"
+            />
 
-     <SwitchPreference
-         android:key="@string/pref_notification_vibrate_key"
-         android:title="@string/pref_notification_vibrate_title"
-         android:summary="@string/pref_notification_vibrate_summary"
-         android:defaultValue="false"
-         />
+         <SwitchPreference
+             android:key="@string/pref_enable_sound_key"
+             android:title="@string/pref_enable_sound_title"
+             android:defaultValue="false"
+             />
+
+         <RingtonePreference
+             android:defaultValue="content://settings/system/notification_sound"
+             android:key="@string/pref_notification_sound_key"
+             android:title="@string/pref_notification_sound_title"
+             android:ringtoneType="all"
+             android:summary="@string/pref_notification_sound_summary"
+             android:showDefault="true"
+             android:showSilent="true"
+             android:dependency="@string/pref_enable_sound_key"
+             />
+
+        <com.ms.favtodo.preference.SeekBarPreference
+            android:key="@string/pref_alarm_duration_key"
+            android:summary="@string/pref_alarm_duration_summary"
+            android:text="@string/pref_alarm_duration_unit"
+            android:title="@string/pref_alarm_duration_title"
+            android:defaultValue="@integer/alarm_duration_default"
+            android:max="@integer/alarm_duration_max"
+            asp:min="@integer/alarm_duration_min"
+            />
+
+        <CheckBoxPreference
+            android:key="@string/pref_auto_snooze_key"
+            android:summary="@string/pref_auto_snooze_summary"
+            android:title="@string/pref_auto_snooze_title"
+            android:defaultValue="true"
+            />
+
+       <com.ms.favtodo.preference.SeekBarPreference
+            android:key="@string/pref_snooze_interval_key"
+            android:summary="@string/pref_snooze_interval_summary"
+            android:text="@string/pref_snooze_interval_unit"
+            android:title="@string/pref_snooze_interval_title"
+            android:defaultValue="@integer/snooze_duration_default"
+            android:max="@integer/snooze_duration_max"
+            asp:min="@integer/snooze_duration_min"
+            />
+
     </PreferenceCategory>
 </PreferenceScreen>
 

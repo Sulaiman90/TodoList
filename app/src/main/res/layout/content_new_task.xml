@@ -172,11 +172,29 @@
                 android:enabled="false"
                 android:layout_marginTop="8dp"
                 android:text="Change sound"/>
-
-
         </RelativeLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:id="@+id/layout_repeat"
+            android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/repeat"
+                android:paddingBottom="8dp"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_repeat">
+
+            </Spinner>
+        </LinearLayout>
     </LinearLayout>
-
 </RelativeLayout>

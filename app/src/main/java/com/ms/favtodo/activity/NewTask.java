@@ -28,12 +28,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -98,6 +100,9 @@ public class NewTask extends AppCompatActivity {
     @BindView(R.id.enableVibrate_switch) Switch mVibrateSwitch;
     @BindView(R.id.enableSound_cb) CheckBox mSoundCheckBox;
     @BindView(R.id.choose_alarm_sound) Button mChooseSoundButton;
+    private static LinearLayout mRepeatLayout;
+    @BindView(R.id.spinner_repeat)
+    Spinner mRepeatSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +130,7 @@ public class NewTask extends AppCompatActivity {
         mClearTime = findViewById(R.id.clear_time);
 
         mTimeLayout = findViewById(R.id.timeLinearLayout);
+        mRepeatLayout = findViewById(R.id.layout_repeat);
 
         LinearLayout linearLayout = findViewById(R.id.mark_as_done);
 
@@ -133,7 +139,14 @@ public class NewTask extends AppCompatActivity {
 
         mClearDate.setVisibility(View.GONE);
         mClearTime.setVisibility(View.GONE);
+        mRepeatLayout.setVisibility(View.GONE);
         //Log.d(TAG,"New Task "+newTask);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_spinner_items,R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+
+        mRepeatSpinner.setAdapter(adapter);
 
         if (newTask) {
             linearLayout.setVisibility(View.GONE);
@@ -195,6 +208,7 @@ public class NewTask extends AppCompatActivity {
                 mTimeLayout.setVisibility(View.GONE);
             }
             else {
+                mRepeatLayout.setVisibility(View.VISIBLE);
                 showHideButtons(mClearDate, true);
                 checkIfDatePassed(dateInMillis,dateText);
                 mTimeText.setVisibility(View.VISIBLE);
@@ -226,7 +240,7 @@ public class NewTask extends AppCompatActivity {
         mDateText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                taskOperation.hideKeyboard(NewTask.this);
+                TaskOperation.hideKeyboard(NewTask.this);
                 showDatePickerDialog();
             }
         });
@@ -266,6 +280,7 @@ public class NewTask extends AppCompatActivity {
                 showHideButtons(mClearDate, false);
                 showHideButtons(mClearTime, false);
                 mTimeLayout.setVisibility(View.GONE);
+                mRepeatLayout.setVisibility(View.GONE);
                 resetTexts();
                 resetTextColors();
             }
@@ -371,8 +386,10 @@ public class NewTask extends AppCompatActivity {
         int todoFinished;
         int vibrateEnabled = 0;
         int soundEnabled = 0;
+        int repeatSpinnerPos = mRepeatSpinner.getSelectedItemPosition();
 
         //Log.d(TAG,"time "+todoTitle);
+        Log.d(TAG,"repeatSpinnerPos "+repeatSpinnerPos);
         if (!TextUtils.isEmpty(todoTitle)) {
             if(dateText!= null){
                 todoDate = dateText;
@@ -417,6 +434,7 @@ public class NewTask extends AppCompatActivity {
             values.put(TaskEntry.NOTIFICATION_SOUND, notificationSound);
             values.put(TaskEntry.NOTIFICATION_VIBRATE, vibrateEnabled);
             values.put(TaskEntry.NOTIFICATION_SOUND_ENABLED, soundEnabled);
+            values.put(TaskEntry.TASK_REPEAT, repeatSpinnerPos);
 
             long rowId = taskId;
             if (newTask) {
@@ -431,7 +449,7 @@ public class NewTask extends AppCompatActivity {
             Log.d(TAG,"mCalendar "+mCalendar.getTimeInMillis() + " now " + now.getTimeInMillis());
             //Log.d(TAG,"newTask "+newTask);
             //Log.d(TAG,"dateText "+dateText);
-            Log.d(TAG,"dateInMillis "+dateInMillis + " " + now.getTimeInMillis());
+            //Log.d(TAG,"dateInMillis "+dateInMillis + " " + now.getTimeInMillis());
 
             if (!dateText.matches("") ) {
                 //Log.d(TAG,"dateText not empty ");
@@ -631,7 +649,7 @@ public class NewTask extends AppCompatActivity {
 
             mTimeLayout.setVisibility(View.VISIBLE);
             mTimeText.setVisibility(View.VISIBLE);
-
+            mRepeatLayout.setVisibility(View.VISIBLE);
             showHideButtons(mClearDate, true);
 
         }

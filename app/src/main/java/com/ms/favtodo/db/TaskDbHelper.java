@@ -36,7 +36,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 TaskEntry.NOTIFICATION_SOUND + " TEXT, " +
                 TaskEntry.NOTIFICATION_VIBRATE + " INT DEFAULT 0, " +
                 TaskEntry.NOTIFICATION_SOUND_ENABLED + " INT DEFAULT 0, " +
-                TaskEntry.SNOOZE_ON + " INT DEFAULT 1" +
+                TaskEntry.SNOOZE_ON + " INT DEFAULT 1, " +
+                TaskEntry.TASK_REPEAT + " INT DEFAULT 0" +
                 ");";
         db.execSQL(createTable);
     }

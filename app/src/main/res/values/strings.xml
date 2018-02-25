@@ -48,25 +48,50 @@
         <item>Completed</item>
     </string-array>
 
+    <string-array name="repeat_spinner_items">
+        <item>No repeat</item>
+        <item>Once a Day</item>
+        <item>Once a Week</item>
+        <item>Once a Month</item>
+        <item>Once a Year</item>
+    </string-array>
+
+
     <!-- Strings related to Preferences -->
-    <string name="pref_title_notifications">Notifications</string>
+    <string name="pref_title_alert">Alert Popup</string>
+    <string name="pref_title_sounds">Sounds</string>
 
     <string name="pref_due_time_key">alarm_time</string>
     <string name="pref_due_time_12_hr">due_time_value</string>
     <string name="pref_due_hour_minute">due_hour_minute</string>
-    <string name="pref_due_time_summary">Notifications for tasks without due times will appear at </string>
+    <string name="pref_due_time_summary">Alert for tasks without due times will appear at </string>
 
     <string name="pref_enable_sound_key">enable_sound_key</string>
-    <string name="pref_enable_sound_title">Enable sound for notifications</string>
+    <string name="pref_enable_sound_title">Enable sound for alert</string>
 
     <string name="pref_notification_sound_key">notification_sound_key</string>
-    <string name="pref_notification_sound_title">Notification sound</string>
+    <string name="pref_notification_sound_title">Alert sound</string>
     <string name="pref_notification_sound_summary">Default sound</string>
     <string name="no_sound">None</string>
 
     <string name="pref_notification_vibrate_key">vibrate_notification</string>
     <string name="pref_notification_vibrate_title">Vibrate</string>
-    <string name="pref_notification_vibrate_summary">Vibrate on notification</string>
+    <string name="pref_notification_vibrate_summary">Vibrate on alert</string>
+
+    <string name="pref_alarm_duration_key">alarm_duration_key</string>
+    <string name="pref_alarm_duration_dialog_message">alarm_duration_dialog_message</string>
+    <string name="pref_alarm_duration_summary">2 Secs</string>
+    <string name="pref_alarm_duration_unit">sec</string>
+    <string name="pref_alarm_duration_title">Alarm buzz duration</string>
+
+    <string name="pref_auto_snooze_key">pref_auto_snooze_key</string>
+    <string name="pref_auto_snooze_summary">Snooze un-attended reminders!</string>
+    <string name="pref_auto_snooze_title">Auto Snooze</string>
+
+    <string name="pref_snooze_interval_key">pref_snooze_interval_key</string>
+    <string name="pref_snooze_interval_summary">1 min</string>
+    <string name="pref_snooze_interval_unit">min</string>
+    <string name="pref_snooze_interval_title">Auto-snooze interval</string>
 
     <string name="paid">Paid</string>
     <string name="bold">bold</string>
@@ -75,6 +100,20 @@
     <string name="snooze">Snooze</string>
 
     <string name="dateAndTime">%1$s | %2$s</string>
+
+    <string name="repeat">Repeat</string>
+
+    <plurals name="snoozeInterval">
+        <!--
+             As a developer, you should always supply "one" and "other"
+             strings. Your translators will know which strings are actually
+             needed for their language. Always include %d in "one" because
+             translators will need to use %d for languages where "one"
+             doesn't mean 1 (as explained above).
+          -->
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d mins</item>
+    </plurals>
 
 </resources>
 

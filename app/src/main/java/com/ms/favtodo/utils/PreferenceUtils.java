@@ -29,6 +29,23 @@ public class PreferenceUtils {
         return sharedPref.getBoolean(context.getString(R.string.pref_enable_sound_key), false);
     }
 
+    public static boolean isAutoSnoozeEnabled(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.pref_auto_snooze_key), true);
+    }
+
+    public static int getAlertDuration(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getInt(context.getString(R.string.pref_alarm_duration_key),
+                context.getResources().getInteger(R.integer.alarm_duration_default));
+    }
+
+    public static int getAutoSnoozeInterval(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getInt(context.getString(R.string.pref_snooze_interval_key),
+                context.getResources().getInteger(R.integer.snooze_duration_default));
+    }
+
     private static String getDueTimeHourAndMin(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.pref_due_hour_minute),"18:0");

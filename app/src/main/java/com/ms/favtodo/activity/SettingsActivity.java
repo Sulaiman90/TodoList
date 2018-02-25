@@ -8,6 +8,7 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -31,6 +32,7 @@ import android.view.MenuItem;
 import android.widget.TimePicker;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.preference.SeekBarPreference;
 import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.TaskOperation;
 
@@ -63,6 +65,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         private static Preference prefDueTime;
         private Context context;
+        private static final int TYPE_INT = 1;
+        private static final int TYPE_STRING = 2;
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +81,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             prefDueTime.setSummary(getString(R.string.pref_due_time_summary) + " "+timeString);
 
             // notification preference change listener
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notification_sound_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notification_sound_key)), 2);
+
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_alarm_duration_key)), 1);
+
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_snooze_interval_key)), 1);
+
 
             prefDueTime.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -88,13 +97,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             });
         }
 
-        private static void bindPreferenceSummaryToValue(Preference preference) {
+        private static void bindPreferenceSummaryToValue(Preference preference, int type) {
             preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference ,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
+            if(type == TYPE_INT){
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference ,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getInt(preference.getKey(), 0));
+            }
+            else if(type == TYPE_STRING){
+                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference ,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getString(preference.getKey(), ""));
+            }
+
         }
 
         private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
@@ -125,9 +143,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         }
                     }
                 }
+                else  if(preference instanceof SeekBarPreference) {
+                    if(preference.getKey().matches(preference.getContext().getString(R.string.pref_alarm_duration_key))){
+                        int alarmDuration = PreferenceUtils.getAlertDuration(preference.getContext());
+                        preference.setSummary(alarmDuration+" secs");
+                    }
+                    else if(preference.getKey().matches(preference.getContext().getString(R.string.pref_snooze_interval_key))){
+                        int snoozeInterval = PreferenceUtils.getAutoSnoozeInterval(preference.getContext());
+                        Resources res = preference.getContext().getResources();
+                        String mins = res.getQuantityString(R.plurals.snoozeInterval, snoozeInterval, snoozeInterval);
+                        preference.setSummary(mins);
+                    }
+                }
                 return true;
             }
         };
+
 
         public void showTimePickerDialog() {
             // Log.d(TAG,"showTimePickerDialog");
