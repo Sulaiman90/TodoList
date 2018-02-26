@@ -51,7 +51,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 snoozeOn = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.SNOOZE_ON)) == 1;
             }
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Log.d(TAG, "AlarmReceiver: snoozeOn "+snoozeOn);
+            //Log.d(TAG, "AlarmReceiver: snoozeOn "+snoozeOn);
             if(snoozeOn){
                 context.startActivity(newIntent);
             }

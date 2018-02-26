@@ -20,28 +20,3 @@
 </layer-list>
 
 
-<!--android:shape="rectangle">
-
-&lt;!&ndash; view background color &ndash;&gt;
-<solid
-    android:color="@color/colorWhite" >
-</solid>
-
-&lt;!&ndash; Here is the corner radius &ndash;&gt;
-<corners
-    android:radius="5dp"   >
-</corners>-->
-
-    <!-- view border color and width -->
-    <!--<stroke-->
-    <!--android:width="3dp"-->
-    <!--android:color="#1c1b20" >-->
-    <!--</stroke>-->
-
-    <!-- If you want to add some padding -->
-    <!--<padding-->
-    <!--android:left="@dimen/listView_margin"-->
-    <!--android:top="@dimen/listView_margin"-->
-    <!--android:right="@dimen/listView_margin"-->
-    <!--android:bottom="@dimen/listView_margin"    >-->
-    <!--</padding>-->

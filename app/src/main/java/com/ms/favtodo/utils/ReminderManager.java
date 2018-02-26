@@ -22,18 +22,20 @@ public class ReminderManager {
     public static void scheduleReminder(Calendar when, Context context, long taskId){
 
         //TaskOperation.showDebugToast(context,"scheduleReminder");
-        Log.d(TAG,"scheduleReminder");
+        //Log.d(TAG,"scheduleReminder");
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
         Intent i = new Intent(context, AlarmReceiver.class);
         i.putExtra(NewTask.TASK_ID, taskId);
 
-        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_ONE_SHOT);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
+        PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_CANCEL_CURRENT);
+        if (mAlarmManager != null) {
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP, when.getTimeInMillis(), pi);
+        }
     }
 
     public static void cancelReminder(Context context,long taskId){
-        Log.d(TAG, "cancelReminder");
+       // Log.d(TAG, "cancelReminder");
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -41,12 +43,11 @@ public class ReminderManager {
         if (mAlarmManager != null) {
             mAlarmManager.cancel(pi);
         }
-        cancelNotification(context,taskId);
     }
 
-    public static void snoozeReminder(Context context,long taskId){
-        Log.d(TAG, "snoozeReminder");
-
+    public static void cancelReminderAndNotification(Context context,long taskId){
+        cancelReminder(context, taskId);
+        cancelNotification(context, taskId);
     }
 
     public static void cancelNotification(Context context,long notificationId){
@@ -54,7 +55,9 @@ public class ReminderManager {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         /*  NOTIFICATION_ID allows you to update or cancel the notification later on */
-        notificationManager.cancel((int)notificationId);
+        if (notificationManager != null) {
+            notificationManager.cancel((int)notificationId);
+        }
     }
 
     public static void rescheduleAlarm(Context context){
@@ -71,7 +74,6 @@ public class ReminderManager {
                     if(!TaskOperation.isPassed(dateInMs,hour,minute)){
                         rescheduleTasks++;
                         int rowId = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID));
-                        String title = c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE));
 
                         Calendar mCalendar = Calendar.getInstance();
                         Calendar cal = Calendar.getInstance();

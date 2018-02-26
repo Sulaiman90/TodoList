@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -103,6 +104,17 @@ public class NotificationUtils {
                 context.getResources().getString(R.string.ignore_remainder),
                 pendingIntent);
         return ignoreReminderAction;
+    }
+
+    public static Uri getDefaultNotificationSound(){
+        Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(notificationSound == null){
+            notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            if(notificationSound == null){
+                notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            }
+        }
+        return notificationSound;
     }
 }
 

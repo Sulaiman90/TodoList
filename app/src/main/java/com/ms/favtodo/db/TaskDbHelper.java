@@ -9,11 +9,16 @@ import android.util.Log;
 
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.model.TaskDetails;
+import com.ms.favtodo.utils.ReminderManager;
+import com.ms.favtodo.utils.TaskOperation;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
 public class TaskDbHelper extends SQLiteOpenHelper {
+
+    private Context mContext;
 
     private static final String TAG = "FavDo_TaskDbHelper";
 
@@ -86,6 +91,63 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Calendar repeatTask(int taskId, int repeatValue){
+
+        Cursor c1 = fetchTask(taskId);
+
+        if(c1.getCount() == 0){
+           return null;
+        }
+
+        Log.d(TAG, "repeatValue "+repeatValue);
+
+        long dateInMillis = c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS));
+        String time =  c1.getString(c1.getColumnIndex(TaskEntry.TASK_TIME));
+
+        Calendar repeat = Calendar.getInstance();
+        Calendar current = Calendar.getInstance();
+
+        repeat.setTimeInMillis(dateInMillis);
+        current.setTimeInMillis(dateInMillis);
+
+        if(repeatValue == 1){
+            repeat.add(Calendar.DATE,1);
+        }
+        else if(repeatValue == 2){
+            repeat.add(Calendar.DATE,7);
+        }
+        else if(repeatValue == 3){
+            repeat.add(Calendar.MONTH, 2);
+        }
+        else if(repeatValue == 4){
+            repeat.add(Calendar.YEAR, 1);
+        }
+
+        long updateDateInMillis = repeat.getTimeInMillis();
+
+        SimpleDateFormat day_date = new SimpleDateFormat("EEE");
+        SimpleDateFormat month_date = new SimpleDateFormat("MMM");
+
+        String dayName = day_date.format(repeat.getTime());
+        String monthName = month_date.format(repeat.getTime());
+
+        int year = repeat.get(Calendar.YEAR);
+        int day =  repeat.get(Calendar.DAY_OF_MONTH);
+
+        String date = TaskOperation.setDateString(year, monthName, day, dayName);
+        String dateAndTime = TaskOperation.getDateAndTime(date, time);
+
+        ContentValues cv = new ContentValues();
+        cv.put(TaskEntry.TASK_DONE, 0);
+        cv.put(TaskEntry.TASK_DATE_IN_MS, updateDateInMillis);
+        cv.put(TaskEntry.TASK_DATE, date);
+        cv.put(TaskEntry.TASK_DATE_AND_TIME, dateAndTime);
+
+        int rowsUpdated = updateTask(taskId, cv);
+
+        return repeat;
+    }
+
     public Cursor fetchTasksWithoutDueTime(){
         String empty = "";
         Cursor cursor = this.getReadableDatabase().query(
@@ -111,7 +173,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         int result = 0;
         try{
             result = db.update(TaskEntry.TABLE_NAME, cv,  TaskEntry.TASK_ID + " = "+taskId, null);
-            Log.d(TAG,"updateTask "+result);
+           // Log.d(TAG,"updateTask "+result);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -124,7 +186,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         int result = 0;
         try {
             result = db.delete(TaskEntry.TABLE_NAME, TaskEntry.TASK_ID + " = ?", new String[]{Integer.toString(taskId)});
-            Log.d(TAG,"Deleted rows "+result);
+            //Log.d(TAG,"Deleted rows "+result);
         }
         catch (Exception e){
             e.printStackTrace();

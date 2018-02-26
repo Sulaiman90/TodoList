@@ -26,14 +26,14 @@ public class AlertDialogFragment extends DialogFragment{
                 // User cannot dismiss dialog by hitting back button
                 .setCancelable(false)
                 // Set up No Button
-                .setNegativeButton(getResources().getString(R.string.no_alert),
+                .setNegativeButton(getResources().getString(R.string.no),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
                                 ((NewTask) getActivity()).continueDelete(false);
                             }
                         })
                 // Set up Yes Button
-                .setPositiveButton(getResources().getString(R.string.yes_alert),
+                .setPositiveButton(getResources().getString(R.string.ok),
                         new DialogInterface.OnClickListener() {
                             public void onClick(
                                     final DialogInterface dialog, int id) {

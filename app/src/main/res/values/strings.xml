@@ -31,12 +31,8 @@
     <string name="later">Later</string>
     <string name="no_date">No Due Date</string>
 
-    <string name="delete_alert">Are you sure to delete ?</string>
-    <string name="no_alert">No</string>
-    <string name="yes_alert">Yes</string>
-
     <string name="task_completed">Task marked as completed</string>
-    <string name="task_not_completed">Task marked as incomplete</string>
+    <string name="task_not_completed">Task moved to redo</string>
     <string name="task_deleted">Task Deleted</string>
 
     <string name="ignore_remainder">Ignore</string>
@@ -56,8 +52,8 @@
         <item>Once a Year</item>
     </string-array>
 
-
     <!-- Strings related to Preferences -->
+
     <string name="pref_title_alert">Alert Popup</string>
     <string name="pref_title_sounds">Sounds</string>
 
@@ -102,6 +98,18 @@
     <string name="dateAndTime">%1$s | %2$s</string>
 
     <string name="repeat">Repeat</string>
+
+    <!-- Strings related to dialogs -->
+
+    <string name="delete_alert">Are you sure to delete ?</string>
+    <string name="no">No</string>
+    <string name="ok">Yes</string>
+
+    <string name="repeat_dialog_message">Repeat Task</string>
+    <string name="repeat_dialog_title">Repeat Task ?</string>
+
+
+    <!-- Strings related to plurals -->
 
     <plurals name="snoozeInterval">
         <!--

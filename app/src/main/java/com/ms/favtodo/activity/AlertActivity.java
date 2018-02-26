@@ -152,7 +152,7 @@ public class AlertActivity extends AppCompatActivity {
             ReminderManager.cancelReminder(this, taskId);
             ContentValues cv = new ContentValues();
             cv.put(TaskContract.TaskEntry.SNOOZE_ON , 0);
-            dbHelper.updateTask((int)taskId, cv);
+           // dbHelper.updateTask((int)taskId, cv);
             Log.d(TAG,"cancelReminder");
             if (mTimer != null) {
                // Log.d(TAG,"timer cancelled");
@@ -165,7 +165,7 @@ public class AlertActivity extends AppCompatActivity {
 
         mVibrate = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.NOTIFICATION_VIBRATE)) == 1;
 
-        Log.d(TAG, "soundEnabled "+soundEnabled +" mVibrate "+mVibrate);
+        //Log.d(TAG, "soundEnabled "+soundEnabled +" mVibrate "+mVibrate);
 
         if(!soundEnabled && !mVibrate){
             mIvSilence.setVisibility(View.INVISIBLE);
@@ -205,7 +205,7 @@ public class AlertActivity extends AppCompatActivity {
         launchIntent.setAction(ReminderTasks.ACTION_TASK_COMPLETED);
         launchIntent.putExtra(NewTask.TASK_ID,taskId);
         startService(launchIntent);
-        Log.d(TAG, "taskCompleted");
+       // Log.d(TAG, "taskCompleted");
         showNotification = false;
         finish();
     }
@@ -234,7 +234,7 @@ public class AlertActivity extends AppCompatActivity {
     private void snoozeAlarm(){
         int snoozeMinutes = PreferenceUtils.getAutoSnoozeInterval(this);
 
-        Log.d(TAG, "snoozeAlarm:snoozeMinutes "+snoozeMinutes);
+      //  Log.d(TAG, "snoozeAlarm:snoozeMinutes "+snoozeMinutes);
 
         final long snoozeTime = System.currentTimeMillis() + (1000 * 60 * snoozeMinutes);
 
@@ -246,16 +246,9 @@ public class AlertActivity extends AppCompatActivity {
 
         String timeString = TaskOperation.generateTime(hour,minute);
 
-        Log.d(TAG, "hour "+hour +" minute "+minute);
+       // Log.d(TAG, "hour "+hour +" minute "+minute);
         Toast.makeText(this, "Remind you again at " + timeString,Toast.LENGTH_SHORT).show();
 
-        AlarmManager mAlarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(this, AlarmReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(this, (int)taskId, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        pi.cancel();
-        if (mAlarmManager != null) {
-            mAlarmManager.cancel(pi);
-        }
         ReminderManager.scheduleReminder(when, this, taskId);
     }
 
@@ -312,7 +305,7 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
+       // Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
         super.onDestroy();
         cleanup();
         if(showNotification){
@@ -330,7 +323,7 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
+       // Log.d(TAG, "onPause");
         super.onPause();
         finish();
     }
@@ -341,7 +334,7 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     private void cleanup() {
-        Log.d(TAG, "cleanup");
+        //Log.d(TAG, "cleanup");
         if(mVibrator != null){
             mVibrator.cancel();
         }
@@ -363,7 +356,7 @@ public class AlertActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            Log.d(TAG, "run");
+            //Log.d(TAG, "run");
             addNotification();
             finish();
         }

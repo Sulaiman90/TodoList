@@ -1,11 +1,13 @@
 package com.ms.favtodo.utils;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
@@ -42,7 +44,6 @@ public class TaskOperation {
     }
 
     public int retrieveTasks(Boolean completedTasksOnly){
-
 
         ArrayList<TaskDetails> taskList = new ArrayList<>();
         taskList.clear();
@@ -104,6 +105,7 @@ public class TaskOperation {
                     task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));
                     task.setTaskHour(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR)));
                     task.setTaskMinute(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE)));
+                    task.setRepeatEnabled(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_REPEAT)) != 0);
                     taskList.add(task);
 
                     long date = c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS));
@@ -112,7 +114,6 @@ public class TaskOperation {
                         noDateTasks.add(task);
                     }
                     else if(isPassed(date,task.getTaskHour(),task.getTaskMinute())){
-                       // showDebugToast(mContext,"isPassed "+task.getTitle() +" "+task.getTaskHour() +" "+task.getTaskMinute());
                        // Log.d(TAG,"isToday "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
                        // Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
                         overdueTasks.add(task);
@@ -405,18 +406,37 @@ public class TaskOperation {
         return false;
     }
 
+    public static String setDateString(int year, String monthOfYear, int dayOfMonth, String dayName) {
+
+        // Increment monthOfYear for Calendar/Date -> Time Format setting
+        String mon = "" + monthOfYear;
+        String day = "" + dayOfMonth;
+
+        if (dayOfMonth < 10)
+            day = "0" + dayOfMonth;
+
+        return dayName + ", " + mon + " " + day + ", " + year;
+    }
+
+    public static String getDateAndTime(String todoDate, String todoTime){
+        String todoDateAndTime;
+        if (!TextUtils.isEmpty(todoTime)) {
+            todoDateAndTime = todoDate + ", " + todoTime;
+        } else {
+            todoDateAndTime = todoDate;
+        }
+        return todoDateAndTime;
+    }
 
     public static void hideKeyboard(@NonNull Activity activity) {
         // Check if no view has focus:
         View view = activity.getCurrentFocus();
         if (view != null) {
             InputMethodManager inputManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            if (inputManager != null) {
+                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
         }
-    }
-
-    public static void showDebugToast(Context context,String msg){
-       // Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
     public static String generateTime(int selectedHour, int selectedMinute){
@@ -442,6 +462,11 @@ public class TaskOperation {
 
         String timeString = hour +":"+min +" "+timeSet;
         return timeString;
+    }
+
+
+    public static void showDebugToast(Context context,String msg){
+        // Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
 }

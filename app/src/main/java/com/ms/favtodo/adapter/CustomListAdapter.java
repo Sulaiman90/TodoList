@@ -12,10 +12,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.model.TaskDetails;
@@ -106,14 +108,15 @@ public class CustomListAdapter extends BaseAdapter{
                 case TYPE_TASK:
                     taskDetails = taskList.get(position);
                     convertView = inflater.inflate(R.layout.item_todo, parent, false);
-                    viewHolder.tvTitle = (TextView) convertView.findViewById(R.id.title);
-                    viewHolder.tvdateTime = (TextView) convertView.findViewById(R.id.date_time);
-                    viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.task_done);
+                    viewHolder.tvTitle =  convertView.findViewById(R.id.title);
+                    viewHolder.tvdateTime =  convertView.findViewById(R.id.date_time);
+                    viewHolder.checkBox =  convertView.findViewById(R.id.task_done);
+                    viewHolder.ivRepeat = convertView.findViewById(R.id.iv_repeat);
                /*   Log.d(TAG,"tasks:position "+position +" title "+taskDetails.getTitle());*/
                     break;
                 case TYPE_HEADER:
                     convertView = inflater.inflate(R.layout.section_header, parent, false);
-                    viewHolder.tvHeader = (TextView) convertView.findViewById(R.id.section_title);
+                    viewHolder.tvHeader =  convertView.findViewById(R.id.section_title);
                     break;
             }
             convertView.setTag(viewHolder);
@@ -140,6 +143,12 @@ public class CustomListAdapter extends BaseAdapter{
 
                 String result = taskOperation.checkDates(dateInMilliSeconds);
 
+                if(taskDetails.isRepeatEnabled()){
+                    viewHolder.ivRepeat.setVisibility(View.VISIBLE);
+                }
+                else{
+                    viewHolder.ivRepeat.setVisibility(View.GONE);
+                }
                //  Log.d(TAG,"Task Title "+taskDetails.getTitle() +" hour "+taskDetails.getTaskHour() + " minute "+taskDetails.getTaskMinute());
 
                 if (!result.equals("")) {
@@ -195,7 +204,7 @@ public class CustomListAdapter extends BaseAdapter{
                             toastMsg = mContext.getResources().getString(R.string.task_not_completed);
                         }
                         dbHelper.updateTask(taskDetails.getTaskId(), values);
-                        ReminderManager.cancelReminder(mContext,taskDetails.getTaskId());
+                        ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
                         View v1 = (View) v.getParent();
                         removeListItem(v1,position);
                         if(toastobject!= null){
@@ -252,6 +261,7 @@ public class CustomListAdapter extends BaseAdapter{
         TextView tvdateTime;
         CheckBox checkBox;
         TextView tvHeader;
+        ImageView ivRepeat;
 
     }
 }

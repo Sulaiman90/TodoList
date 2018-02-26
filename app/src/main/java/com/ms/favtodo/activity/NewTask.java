@@ -1,6 +1,8 @@
 package com.ms.favtodo.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -9,6 +11,7 @@ import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -42,6 +45,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.db.TaskContract;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.dialog.AlertDialogFragment;
@@ -93,6 +97,8 @@ public class NewTask extends AppCompatActivity {
     private static LinearLayout mTimeLayout;
     private String notificationSound = "";
     private TaskDetails task;
+
+    int mRepeatSpinnerValue = 0;
 
     public static String TASK_ID = "taskId";
     public static String PLAY_SOUND = "playSound";
@@ -185,6 +191,7 @@ public class NewTask extends AppCompatActivity {
             dateText = task.getDate();
             timeText = task.getTime();
             notificationSound = task.getNotificationSound();
+            mRepeatSpinner.setSelection(c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.TASK_REPEAT)));
 
             mDateText.setText(dateText);
             mTimeText.setText(timeText);
@@ -386,10 +393,11 @@ public class NewTask extends AppCompatActivity {
         int todoFinished;
         int vibrateEnabled = 0;
         int soundEnabled = 0;
-        int repeatSpinnerPos = mRepeatSpinner.getSelectedItemPosition();
 
-        //Log.d(TAG,"time "+todoTitle);
-        Log.d(TAG,"repeatSpinnerPos "+repeatSpinnerPos);
+        mRepeatSpinnerValue = mRepeatSpinner.getSelectedItemPosition();
+
+        Log.d(TAG,"time "+todoTitle);
+       // Log.d(TAG,"repeatSpinnerPos "+mRepeatSpinnerValue);
         if (!TextUtils.isEmpty(todoTitle)) {
             if(dateText!= null){
                 todoDate = dateText;
@@ -399,11 +407,9 @@ public class NewTask extends AppCompatActivity {
             }
 
             todoTime = mTimeText.getText().toString();
-            if (!TextUtils.isEmpty(todoTime)) {
-                todoDateAndTime = todoDate + ", " + todoTime;
-            } else {
-                todoDateAndTime = todoDate;
-            }
+
+            todoDateAndTime = TaskOperation.getDateAndTime(todoDate, todoTime);
+
             if (mTaskDone.isChecked()) {
                 todoFinished = 1;
             } else {
@@ -422,31 +428,35 @@ public class NewTask extends AppCompatActivity {
             }
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.TASK_TITLE, todoTitle);
-            values.put(TaskEntry.TASK_DATE, todoDate);
-            values.put(TaskEntry.TASK_TIME, todoTime);
-            values.put(TaskEntry.TASK_DATE_AND_TIME, todoDateAndTime);
-            values.put(TaskEntry.TASK_DONE, todoFinished);
-            values.put(TaskEntry.TASK_DATE_IN_MS, dateInMillis);
-            values.put(TaskEntry.TASK_HOUR, taskHour);
-            values.put(TaskEntry.TASK_MINUTE, taskMinute);
-            values.put(TaskEntry.NOTIFICATION_SOUND, notificationSound);
-            values.put(TaskEntry.NOTIFICATION_VIBRATE, vibrateEnabled);
-            values.put(TaskEntry.NOTIFICATION_SOUND_ENABLED, soundEnabled);
-            values.put(TaskEntry.TASK_REPEAT, repeatSpinnerPos);
+
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put(TaskEntry.TASK_TITLE, todoTitle);
+            contentValues.put(TaskEntry.TASK_DATE, todoDate);
+            contentValues.put(TaskEntry.TASK_TIME, todoTime);
+            contentValues.put(TaskEntry.TASK_DATE_AND_TIME, todoDateAndTime);
+            contentValues.put(TaskEntry.TASK_DONE, todoFinished);
+            contentValues.put(TaskEntry.TASK_DATE_IN_MS, dateInMillis);
+            contentValues.put(TaskEntry.TASK_HOUR, taskHour);
+            contentValues.put(TaskEntry.TASK_MINUTE, taskMinute);
+            contentValues.put(TaskEntry.NOTIFICATION_SOUND, notificationSound);
+            contentValues.put(TaskEntry.NOTIFICATION_VIBRATE, vibrateEnabled);
+            contentValues.put(TaskEntry.NOTIFICATION_SOUND_ENABLED, soundEnabled);
+            contentValues.put(TaskContract.TaskEntry.SNOOZE_ON , 1);
+            contentValues.put(TaskEntry.TASK_REPEAT, mRepeatSpinnerValue);
 
             long rowId = taskId;
             if (newTask) {
-                rowId = dbHelper.insertTask(values);
+                rowId = dbHelper.insertTask(contentValues);
             } else {
-                dbHelper.updateTask(taskId, values);
+                dbHelper.updateTask(taskId, contentValues);
             }
 
             Calendar now = Calendar.getInstance();
+            boolean showRepeatTaskAlert = false;
 
             //TaskOperation.showDebugToast(this,mCalendar.getTimeInMillis() + " " +now.getTimeInMillis());
-            Log.d(TAG,"mCalendar "+mCalendar.getTimeInMillis() + " now " + now.getTimeInMillis());
+           // Log.d(TAG,"mCalendar "+mCalendar.getTimeInMillis() + " now " + now.getTimeInMillis());
             //Log.d(TAG,"newTask "+newTask);
             //Log.d(TAG,"dateText "+dateText);
             //Log.d(TAG,"dateInMillis "+dateInMillis + " " + now.getTimeInMillis());
@@ -460,25 +470,29 @@ public class NewTask extends AppCompatActivity {
                     //Log.d(TAG,"else  ");
                     if(todoFinished==0  && (dateInMillis > now.getTimeInMillis() )){
                       //  Log.d(TAG,"in  ");
-                        ReminderManager.cancelReminder(this,taskId);
+                       // ReminderManager.cancelReminder(this,taskId);
                         ReminderManager.scheduleReminder(mCalendar,this,taskId);
-                        //Log.d(TAG,"cancelled and scheduled ");
+                        Log.d(TAG,"scheduled ");
                     }
                     else if(todoFinished==1){
-                        ReminderManager.cancelReminder(this,taskId);
+                        ReminderManager.cancelReminderAndNotification(this,taskId);
+                        Log.d(TAG,"cancelled Reminder ");
+                        if(mRepeatSpinnerValue != 0){
+                            showRepeatTaskAlert = true;
+                            showRepeatAlertDialog();
+                        }
+                        else{
+                            Toast.makeText(this, getString(R.string.task_completed),Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
-            }
-            else{
-               // TaskOperation.showDebugToast(this,"reminder not set");
             }
 
             db.close();
 
-            Intent intent = new Intent();
-            setResult(RESULT_OK,intent);
-            finish();
-
+            if(!showRepeatTaskAlert){
+                exitActivity();
+            }
         } else {
             Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for specific milliseconds
@@ -502,10 +516,8 @@ public class NewTask extends AppCompatActivity {
             toastobject = Toast.makeText(getApplicationContext(),
                     getResources().getString(R.string.task_deleted), Toast.LENGTH_SHORT);
             toastobject.show();
-            Intent intent = new Intent();
-            setResult(RESULT_OK,intent);
-            ReminderManager.cancelReminder(this,taskId);
-            finish();
+            ReminderManager.cancelReminderAndNotification(this,taskId);
+            exitActivity();
         }
         else{
             mDialog.dismiss();
@@ -584,10 +596,47 @@ public class NewTask extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
+    public void showRepeatAlertDialog(){
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new Builder(this);
+
+        // 2. Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(R.string.repeat_dialog_message);
+                //.setTitle(R.string.repeat_dialog_title);
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Calendar repeatCal = dbHelper.repeatTask(taskId, mRepeatSpinnerValue);
+                if(repeatCal != null){
+                    ReminderManager.cancelNotification(NewTask.this,taskId);
+                    ReminderManager.scheduleReminder(repeatCal,NewTask.this,taskId);
+                }
+                exitActivity();
+            }
+        });
+
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                exitActivity();
+            };
+        });
+
+        // 3. Get the AlertDialog from create()
+        AlertDialog repeatAlertDialog = builder.create();
+        repeatAlertDialog.show();
+    }
+
+    public void exitActivity(){
+        Intent intent = new Intent();
+        setResult(RESULT_OK,intent);
+        finish();
+    }
+
     // DialogFragment used to pick a ToDoItem deadline date
 
-    public static class DatePickerFragment extends DialogFragment implements
-            OnDateSetListener {
+    public static class DatePickerFragment extends DialogFragment implements OnDateSetListener {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -643,7 +692,7 @@ public class NewTask extends AppCompatActivity {
 
             dateInMillis = cal.getTimeInMillis();
 
-            dateText = setDateString(selectedYear, monthName, selectedDay, dayName);
+            dateText = TaskOperation.setDateString(selectedYear, monthName, selectedDay, dayName);
 
             checkIfDatePassed(dateInMillis,dateText);
 
@@ -655,21 +704,10 @@ public class NewTask extends AppCompatActivity {
         }
     }
 
-    private static String setDateString(int year, String monthOfYear, int dayOfMonth, String dayName) {
-
-        // Increment monthOfYear for Calendar/Date -> Time Format setting
-        String mon = "" + monthOfYear;
-        String day = "" + dayOfMonth;
-
-        if (dayOfMonth < 10)
-            day = "0" + dayOfMonth;
-
-        return dayName + ", " + mon + " " + day + ", " + year;
-    }
 
 
-    public static class TimePickerFragment extends DialogFragment
-            implements OnTimeSetListener {
+
+    public static class TimePickerFragment extends DialogFragment implements OnTimeSetListener {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {

@@ -16,7 +16,7 @@ public class PreferenceUtils {
     public static String getNotificationSound(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getString(context.getString(R.string.pref_notification_sound_key),
-                CommonUtils.getDefaultNotificationSound().toString());
+                NotificationUtils.getDefaultNotificationSound().toString());
     }
 
     public static boolean isVibrateEnabled(Context context){

@@ -28,14 +28,27 @@
             />
 
         <TextView
+            android:id="@+id/date_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/date_time"
-            android:text="Task Date and Time"
-            android:textColor="@color/colorPrimary"
             android:layout_alignStart="@+id/title"
             android:layout_below="@+id/title"
             android:paddingBottom="@dimen/listItem_top_padding"
-            />
+            android:text="11 PM"
+            android:textColor="@color/colorPrimary"/>
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_repeat"
+            android:layout_toEndOf="@id/date_time"
+            android:layout_marginTop="22dp"
+            android:layout_marginStart="2dp"
+            android:visibility="visible"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            android:contentDescription="repeat"
+            android:tint="@color/colorGrey600"
+            android:src="@drawable/ic_repeat"/>
 
 </RelativeLayout>
