@@ -1,7 +1,11 @@
 package com.ms.favtodo.adapter;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -25,12 +29,12 @@ import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.TreeSet;
 
 public class CustomListAdapter extends BaseAdapter{
 
     private ArrayList<TaskDetails> taskList;
-    private boolean[] checkBoxState;
     private TaskDbHelper dbHelper;
 
     private TaskOperation taskOperation;
@@ -38,13 +42,16 @@ public class CustomListAdapter extends BaseAdapter{
 
     private static final int TYPE_TASK = 0;
     private static final int TYPE_HEADER = 1;
-    private TreeSet<Integer> sectionHeader = new TreeSet<>();
+    private ContentValues values;
 
     private LayoutInflater inflater;
     private Context mContext;
     private TaskDetails taskDetails;
 
-    private Toast toastobject;
+    private Toast mToast;
+
+    private String toastMsg;
+    private View mListRow;
 
     private static final String TAG = "CustomListAdapter";
 
@@ -143,7 +150,7 @@ public class CustomListAdapter extends BaseAdapter{
 
                 String result = taskOperation.checkDates(dateInMilliSeconds);
 
-                if(taskDetails.isRepeatEnabled()){
+                if(taskDetails.getRepeatValue() != 0){
                     viewHolder.ivRepeat.setVisibility(View.VISIBLE);
                 }
                 else{
@@ -193,9 +200,9 @@ public class CustomListAdapter extends BaseAdapter{
                     public void onClick(View v) {
                        // Log.d(TAG,"checkbox clicked "+((CheckBox) v).isChecked());
                       //  Log.d(TAG,"checked:task "+taskDetails.getTitle()+" "+position);
-                        ContentValues values = new ContentValues();
+                        values = new ContentValues();
                         taskDetails = taskList.get(position);
-                        String toastMsg;
+
                         if (((CheckBox) v).isChecked()) {
                             values.put(TaskEntry.TASK_DONE, 1);
                             toastMsg = mContext.getResources().getString(R.string.task_completed);
@@ -203,15 +210,16 @@ public class CustomListAdapter extends BaseAdapter{
                             values.put(TaskEntry.TASK_DONE, 0);
                             toastMsg = mContext.getResources().getString(R.string.task_not_completed);
                         }
-                        dbHelper.updateTask(taskDetails.getTaskId(), values);
-                        ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
-                        View v1 = (View) v.getParent();
-                        removeListItem(v1,position);
-                        if(toastobject!= null){
-                            toastobject.cancel();
+
+                        mListRow = (View) v.getParent();
+                        if(!completedTasksOnly && taskDetails.getRepeatValue() != 0){
+                            showRepeatAlertDialog(taskDetails.getTaskId(),taskDetails.getRepeatValue(),position);
                         }
-                        toastobject = Toast.makeText(mContext,toastMsg,Toast.LENGTH_SHORT);
-                        toastobject.show();
+                        else{
+                            dbHelper.updateTask(taskDetails.getTaskId(), values);
+                            ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
+                            slideListItem(position);
+                        }
                     }
                 });
             }
@@ -237,11 +245,11 @@ public class CustomListAdapter extends BaseAdapter{
         return convertView;
     }
 
-    private void removeListItem(View rowView, final int position) {
-        // TODO Auto-generated method stub
+
+    private void slideListItem(final int position) {
        // Log.d(TAG,"removeListItem");
-        final Animation animation = AnimationUtils.loadAnimation(rowView.getContext(), R.anim.slide_out);
-        rowView.startAnimation(animation);
+        final Animation animation = AnimationUtils.loadAnimation(mListRow.getContext(), R.anim.slide_out);
+        mListRow.startAnimation(animation);
         Handler handle = new Handler();
         handle.postDelayed(new Runnable() {
 
@@ -251,10 +259,57 @@ public class CustomListAdapter extends BaseAdapter{
                 notifyDataSetChanged();
                 animation.cancel();
                 taskOperation.retrieveTasks(completedTasksOnly);
+
+                if(mToast!= null){
+                    mToast.cancel();
+                }
+                mToast = Toast.makeText(mContext,toastMsg,Toast.LENGTH_SHORT);
+                mToast.show();
             }
         }, 300);
+
     }
 
+    public void showRepeatAlertDialog(final int taskId, final int repeatSpinnerValue, final int position){
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new Builder(mContext);
+
+        // 2. Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(R.string.repeat_dialog_message);
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Calendar repeatCal = dbHelper.repeatTask(taskId, repeatSpinnerValue);
+                if(repeatCal != null){
+                    ReminderManager.scheduleReminder(repeatCal,mContext,taskId);
+                }
+                ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
+                slideListItem(position);
+            }
+        });
+
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dbHelper.updateTask(taskDetails.getTaskId(), values);
+                ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
+                slideListItem(position);
+            };
+        });
+
+        // 3. Get the AlertDialog from create()
+        AlertDialog repeatAlertDialog = builder.create();
+        repeatAlertDialog.show();
+
+        repeatAlertDialog.setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                CheckBox checkBox = mListRow.findViewById(R.id.task_done);
+                checkBox.setChecked(false);
+            }
+        });
+    }
 
     private static class ViewHolder{
         TextView tvTitle;

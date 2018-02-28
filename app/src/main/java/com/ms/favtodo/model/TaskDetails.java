@@ -17,8 +17,16 @@ public class TaskDetails {
     private String date="";
     private boolean vibrateEnabled = false;
     private boolean soundEnabled = false;
-    private boolean isRepeatEnabled = false;
     private String notificationSound ="";
+    private int repeatValue = 0;
+
+    public int getRepeatValue() {
+        return repeatValue;
+    }
+
+    public void setRepeatValue(int repeatValue) {
+        this.repeatValue = repeatValue;
+    }
 
     public boolean isVibrateEnabled() {
         return vibrateEnabled;
@@ -30,14 +38,6 @@ public class TaskDetails {
 
     public boolean isSoundEnabled() {
         return soundEnabled;
-    }
-
-    public boolean isRepeatEnabled() {
-        return isRepeatEnabled;
-    }
-
-    public void setRepeatEnabled(boolean isRepeatEnabled) {
-        this.isRepeatEnabled = isRepeatEnabled;
     }
 
     public void setSoundEnabled(boolean soundEnabled) {

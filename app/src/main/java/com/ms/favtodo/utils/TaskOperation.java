@@ -81,7 +81,7 @@ public class TaskOperation {
             c1 = dbHelper.fetchCompletedTasks(0);
         }
 
-        Log.d(TAG,"getCount "+c1.getCount());
+        //Log.d(TAG,"getCount "+c1.getCount());
        /* Log.d(TAG,"completedTasksOnly "+ completedTasksOnly);
 
         int totalTasks = dbHelper.rowcount();
@@ -105,7 +105,7 @@ public class TaskOperation {
                     task.setTaskId(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID)));
                     task.setTaskHour(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR)));
                     task.setTaskMinute(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE)));
-                    task.setRepeatEnabled(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_REPEAT)) != 0);
+                    task.setRepeatValue(c1.getInt(c1.getColumnIndex(TaskEntry.TASK_REPEAT)));
                     taskList.add(task);
 
                     long date = c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS));
@@ -194,7 +194,7 @@ public class TaskOperation {
             adapter = new CustomListAdapter(mContext,finalTaskList,completedTasksOnly);
         }
 
-        ListView listView = (ListView) ((Activity)mContext).findViewById(R.id.todo_lists);
+        ListView listView = ((Activity)mContext).findViewById(R.id.todo_lists);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new OnItemClickListener() {
