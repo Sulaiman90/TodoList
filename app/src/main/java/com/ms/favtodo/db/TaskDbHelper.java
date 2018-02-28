@@ -99,7 +99,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
            return null;
         }
 
-        Log.d(TAG, "repeatValue "+repeatValue);
+        //Log.d(TAG, "repeatValue "+repeatValue);
 
         long dateInMillis = c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS));
         String time =  c1.getString(c1.getColumnIndex(TaskEntry.TASK_TIME));

@@ -21,7 +21,6 @@ public class ReminderManager {
 
     public static void scheduleReminder(Calendar when, Context context, long taskId){
 
-        //TaskOperation.showDebugToast(context,"scheduleReminder");
         //Log.d(TAG,"scheduleReminder");
         AlarmManager mAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
@@ -93,6 +92,39 @@ public class ReminderManager {
             }
             c1.close();
         }
-       // TaskOperation.showDebugToast(context, rescheduleTasks+"");
+    }
+
+    public static void restartAlarms(Context context){
+        TaskDbHelper dbHelper = new TaskDbHelper(context);
+        Cursor c1 = dbHelper.fetchCompletedTasks(0);
+
+        if(c1!=null) {
+            if (c1.getCount() != 0 && c1.moveToFirst()) {
+                do {
+                    long dateInMs = c1.getLong(c1.getColumnIndex(TaskEntry.TASK_DATE_IN_MS));
+                    int hour = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR));
+                    int minute = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE));
+
+                    if(!TaskOperation.isPassed(dateInMs,hour,minute)){
+                        int rowId = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID));
+
+                        Calendar mCalendar = Calendar.getInstance();
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTimeInMillis(dateInMs);
+
+                        mCalendar.set(Calendar.YEAR, cal.get(Calendar.YEAR));
+                        mCalendar.set(Calendar.MONTH, cal.get(Calendar.MONTH));
+                        mCalendar.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
+                        mCalendar.set(Calendar.HOUR_OF_DAY, PreferenceUtils.getHour(context));
+                        mCalendar.set(Calendar.MINUTE, PreferenceUtils.getMinute(context));
+
+                        scheduleReminder(mCalendar,context,(long)rowId);
+                    }
+                }
+                while (c1.moveToNext());
+            }
+            c1.close();
+        }
     }
 }

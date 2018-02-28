@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -68,6 +70,8 @@ public class AlertActivity extends AppCompatActivity {
     private long taskId;
     private boolean mSnooze = true;
     private TaskDbHelper dbHelper;
+    private PowerManager powerManager;
+    private WakeLock wakeLock;
 
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
     @BindView(R.id.tv_alert_time) TextView mTvDateAndTime;
@@ -81,6 +85,10 @@ public class AlertActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Window window = this.getWindow();
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 
         FrameLayout statusbar = findViewById(R.id.statusbar);
 
@@ -113,13 +121,20 @@ public class AlertActivity extends AppCompatActivity {
 
         mPlayTime = PreferenceUtils.getAlertDuration(this) * 1000;
 
+        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+        wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "MyWakelockTag");
+
+        wakeLock.acquire();
+
         start(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d(TAG, " onNewIntent ");
+       // Log.d(TAG, " onNewIntent ");
     }
 
     private void start(Intent intent){
@@ -133,8 +148,7 @@ public class AlertActivity extends AppCompatActivity {
         }
         mSnooze = playSound;
 
-        Log.d(TAG, " taskId "+taskId + " mSnooze "+mSnooze);
-
+        //Log.d(TAG, " taskId "+taskId + " mSnooze "+mSnooze);
 
         Cursor c1 =  dbHelper.fetchTask(taskId);
 
@@ -153,7 +167,7 @@ public class AlertActivity extends AppCompatActivity {
             ContentValues cv = new ContentValues();
             cv.put(TaskContract.TaskEntry.SNOOZE_ON , 0);
            // dbHelper.updateTask((int)taskId, cv);
-            Log.d(TAG,"cancelReminder");
+           // Log.d(TAG,"cancelReminder");
             if (mTimer != null) {
                // Log.d(TAG,"timer cancelled");
                 mTimer.cancel();
@@ -318,6 +332,10 @@ public class AlertActivity extends AppCompatActivity {
         }
         else {
             ReminderManager.cancelNotification(this, taskId);
+        }
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+            wakeLock = null;
         }
     }
 
