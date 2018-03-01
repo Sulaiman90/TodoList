@@ -42,12 +42,11 @@ public class NotificationUtils {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "M_CH_ID")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setContentTitle(taskTitle)
-                .setContentText(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.tap_to_view))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(context.getString(R.string.app_name)))
                 .setSmallIcon(R.drawable.ic_done_white_24dp)
                 .setContentIntent(contentIntent(context,rowId))
-                //.addAction(taskCompletedAction(context,rowId))
-                //.addAction(ignoreReminderAction(context,rowId))
+                .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setAutoCancel(true);
 
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);

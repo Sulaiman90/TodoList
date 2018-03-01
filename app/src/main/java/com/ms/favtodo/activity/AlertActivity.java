@@ -86,10 +86,6 @@ public class AlertActivity extends AppCompatActivity {
 
         Window window = this.getWindow();
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
-
         FrameLayout statusbar = findViewById(R.id.statusbar);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -123,12 +119,19 @@ public class AlertActivity extends AppCompatActivity {
 
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
-        wakeLock = powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "MyWakelockTag");
-
-        wakeLock.acquire();
+        //wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
 
         start(getIntent());
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+       /* if(wakeLock!= null && !wakeLock.isHeld()){
+            Log.d(TAG,"wakeLock");
+            wakeLock.acquire();
+        }*/
     }
 
     @Override
@@ -164,9 +167,6 @@ public class AlertActivity extends AppCompatActivity {
         if(!mSnooze){
             mIvSilence.setVisibility(View.INVISIBLE);
             ReminderManager.cancelReminder(this, taskId);
-            ContentValues cv = new ContentValues();
-            cv.put(TaskContract.TaskEntry.SNOOZE_ON , 0);
-           // dbHelper.updateTask((int)taskId, cv);
            // Log.d(TAG,"cancelReminder");
             if (mTimer != null) {
                // Log.d(TAG,"timer cancelled");
@@ -319,7 +319,7 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-       // Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
+        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
         super.onDestroy();
         cleanup();
         if(showNotification){
@@ -333,10 +333,10 @@ public class AlertActivity extends AppCompatActivity {
         else {
             ReminderManager.cancelNotification(this, taskId);
         }
-        if (wakeLock != null && wakeLock.isHeld()) {
+       /* if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
             wakeLock = null;
-        }
+        }*/
     }
 
     @Override
@@ -374,7 +374,7 @@ public class AlertActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            //Log.d(TAG, "run");
+            Log.d(TAG, "run");
             addNotification();
             finish();
         }

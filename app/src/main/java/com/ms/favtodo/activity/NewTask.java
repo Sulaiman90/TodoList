@@ -396,7 +396,7 @@ public class NewTask extends AppCompatActivity {
 
         mRepeatSpinnerValue = mRepeatSpinner.getSelectedItemPosition();
 
-        Log.d(TAG,"time "+todoTitle);
+        //Log.d(TAG,"time "+todoTitle);
        // Log.d(TAG,"repeatSpinnerPos "+mRepeatSpinnerValue);
         if (!TextUtils.isEmpty(todoTitle)) {
             if(dateText!= null){
@@ -470,13 +470,12 @@ public class NewTask extends AppCompatActivity {
                     //Log.d(TAG,"else  ");
                     if(todoFinished==0  && (dateInMillis > now.getTimeInMillis() )){
                       //  Log.d(TAG,"in  ");
-                       // ReminderManager.cancelReminder(this,taskId);
                         ReminderManager.scheduleReminder(mCalendar,this,taskId);
-                        Log.d(TAG,"scheduled ");
+                        //Log.d(TAG,"scheduled ");
                     }
                     else if(todoFinished==1){
                         ReminderManager.cancelReminderAndNotification(this,taskId);
-                        Log.d(TAG,"cancelled Reminder ");
+                        //Log.d(TAG,"cancelled Reminder ");
                         if(mRepeatSpinnerValue != 0){
                             showRepeatTaskAlert = true;
                             showRepeatAlertDialog();
