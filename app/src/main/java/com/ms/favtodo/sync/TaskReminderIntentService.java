@@ -4,14 +4,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.activity.NewTask;
-
-/**
- * Created by MOHAMED SULAIMAN on 15-09-2017.
- */
 
 public class TaskReminderIntentService extends IntentService {
 
@@ -27,8 +22,11 @@ public class TaskReminderIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String action = intent.getAction();
-        long rowId = intent.getLongExtra(NewTask.TASK_ID,1);
+        String action = null;
+        if (intent != null) {
+            action = intent.getAction();
+        }
+        long rowId = intent != null ? intent.getLongExtra(NewTask.TASK_ID, 1) : 0;
         ReminderTasks.executeTask(this,action,rowId);
 
        if (ReminderTasks.ACTION_TASK_COMPLETED.equals(action)) {

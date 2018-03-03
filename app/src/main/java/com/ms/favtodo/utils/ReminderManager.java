@@ -95,6 +95,8 @@ public class ReminderManager {
         }
     }
 
+    // reschedule alarm after reboot
+
     public static void restartAlarms(Context context){
         TaskDbHelper dbHelper = new TaskDbHelper(context);
         Cursor c1 = dbHelper.fetchInCompletedTasksWithDate();

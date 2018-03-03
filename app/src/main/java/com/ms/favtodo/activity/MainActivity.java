@@ -9,10 +9,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.db.TaskDbHelper;
@@ -67,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
 
         manager.registerReceiver((broadcastReceiver),new IntentFilter(TaskReminderIntentService.SERVICE_RESULT));
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        quickTask = (EditText) findViewById(R.id.quick_task);
-        tickBtn = (ImageButton) findViewById(R.id.tick_btn);
-        footer = (LinearLayout) findViewById(R.id.footer);
-        noFinishedTasks = (TextView) findViewById(R.id.no_tasks);
-        mEmptyLayout = (LinearLayout) findViewById(R.id.toDoEmptyView);
+        fab =  findViewById(R.id.fab);
+        quickTask =  findViewById(R.id.quick_task);
+        tickBtn = findViewById(R.id.tick_btn);
+        footer =  findViewById(R.id.footer);
+        noFinishedTasks =  findViewById(R.id.no_tasks);
+        mEmptyLayout = findViewById(R.id.toDoEmptyView);
 
         tickBtn.setVisibility(View.GONE);
 
@@ -205,10 +202,10 @@ public class MainActivity extends AppCompatActivity {
                     if (position == 0) {
                         // not completed
                         completedTasksOnly = false;
-                        hideShowFooterViews(completedTasksOnly);
+                        hideShowFooterViews(false);
                     } else {
                         completedTasksOnly = true;
-                        hideShowFooterViews(completedTasksOnly);
+                        hideShowFooterViews(true);
                     }
                     loadTasks();
                 }
@@ -269,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideDefaultKeyboard() {
-        taskOperation.hideKeyboard(MainActivity.this);
+        TaskOperation.hideKeyboard(MainActivity.this);
     }
 
     private void hideShowFooterViews(Boolean hide){

@@ -14,6 +14,7 @@ import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 
 public class TaskDbHelper extends SQLiteOpenHelper {
@@ -127,7 +128,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
             repeat.add(Calendar.DATE,7);
         }
         else if(repeatValue == 3){
-            repeat.add(Calendar.MONTH, 2);
+            repeat.add(Calendar.MONTH, 1);
         }
         else if(repeatValue == 4){
             repeat.add(Calendar.YEAR, 1);
@@ -135,8 +136,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         long updateDateInMillis = repeat.getTimeInMillis();
 
-        SimpleDateFormat day_date = new SimpleDateFormat("EEE");
-        SimpleDateFormat month_date = new SimpleDateFormat("MMM");
+        SimpleDateFormat day_date = new SimpleDateFormat("EEE", Locale.US);
+        SimpleDateFormat month_date = new SimpleDateFormat("MMM", Locale.US );
 
         String dayName = day_date.format(repeat.getTime());
         String monthName = month_date.format(repeat.getTime());

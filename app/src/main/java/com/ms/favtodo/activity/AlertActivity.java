@@ -1,11 +1,9 @@
 package com.ms.favtodo.activity;
 
-import android.app.ActionBar;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ContentValues;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -13,13 +11,12 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,10 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
-import com.ms.favtodo.db.TaskContract;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
-import com.ms.favtodo.receiver.AlarmReceiver;
+import com.ms.favtodo.receiver.PhoneStateReceiver;
 import com.ms.favtodo.sync.ReminderTasks;
 import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.NotificationUtils;
@@ -62,7 +58,7 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mVibrate;
     private final long[] mVibratePattern = { 0, 500, 500 ,500, 500 };
     private Button mDismissButton;
-    private boolean mSoundOn = true;;
+    private boolean mSoundOn = true;
     private Timer mTimer = null;
     private PlayTimerTask mTimerTask;
     private long mPlayTime;
@@ -71,6 +67,10 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mSnooze = true;
     private TaskDbHelper dbHelper;
     private PowerManager powerManager;
+    private LocalBroadcastManager mLocalBroadcastManager;
+    private String phoneState = "";
+
+    public static final String PHONE_STATE_BROADCAST = "phone_state_broadcast";
 
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
     @BindView(R.id.tv_alert_time) TextView mTvDateAndTime;
@@ -120,14 +120,54 @@ public class AlertActivity extends AppCompatActivity {
 
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+
         start(getIntent());
     }
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(TelephonyManager.EXTRA_STATE_RINGING.equals(intent.getStringExtra(PhoneStateReceiver.PHONE_STATE))){
+                mSnooze = false;
+                finish();
+            }
+        }
+    };
 
 
     @Override
     protected void onResume() {
+        mLocalBroadcastManager.registerReceiver(mBroadcastReceiver, new IntentFilter(PHONE_STATE_BROADCAST));
         super.onResume();
     }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
+        mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+        super.onDestroy();
+        cleanup();
+        if(showNotification){
+            addNotification();
+            if(PreferenceUtils.isAutoSnoozeEnabled(this)) {
+                if (mSnooze) {
+                    snoozeAlarm();
+                }
+            }
+        }
+        else {
+            ReminderManager.cancelNotification(this, taskId);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        // Log.d(TAG, "onPause");
+        super.onPause();
+        finish();
+    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -144,6 +184,16 @@ public class AlertActivity extends AppCompatActivity {
             taskId = b.getLong(NewTask.TASK_ID);
             playSound = b.getBoolean(NewTask.PLAY_SOUND);
         }
+
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (telephonyManager != null && telephonyManager.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK) {
+            addNotification();
+            mSnooze = false;
+            finish();
+            return;
+        }
+
         mSnooze = playSound;
 
         boolean isScreenOn;
@@ -257,7 +307,7 @@ public class AlertActivity extends AppCompatActivity {
     private void snoozeAlarm(){
         int snoozeMinutes = PreferenceUtils.getAutoSnoozeInterval(this);
 
-      //  Log.d(TAG, "snoozeAlarm:snoozeMinutes "+snoozeMinutes);
+        Log.d(TAG, "snoozeAlarm:snoozeMinutes "+snoozeMinutes);
 
         final long snoozeTime = System.currentTimeMillis() + (1000 * 60 * snoozeMinutes);
 
@@ -326,31 +376,6 @@ public class AlertActivity extends AppCompatActivity {
         if(mMediaPlayer != null){
             mMediaPlayer.start();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
-        super.onDestroy();
-        cleanup();
-        if(showNotification){
-            addNotification();
-            if(PreferenceUtils.isAutoSnoozeEnabled(this)) {
-                if (mSnooze) {
-                    snoozeAlarm();
-                }
-            }
-        }
-        else {
-            ReminderManager.cancelNotification(this, taskId);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-       // Log.d(TAG, "onPause");
-        super.onPause();
-        finish();
     }
 
     @Override
