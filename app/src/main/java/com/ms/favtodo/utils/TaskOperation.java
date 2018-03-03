@@ -75,10 +75,10 @@ public class TaskOperation {
         int totalTasks = 0;
 
         if(completedTasksOnly){
-            c1 = dbHelper.fetchCompletedTasks(1);
+            c1 = dbHelper.fetchCompletedTasks();
         }
         else{
-            c1 = dbHelper.fetchCompletedTasks(0);
+            c1 = dbHelper.fetchInCompletedTasks();
         }
 
         //Log.d(TAG,"getCount "+c1.getCount());

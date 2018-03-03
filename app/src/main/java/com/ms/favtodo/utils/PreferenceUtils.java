@@ -34,6 +34,11 @@ public class PreferenceUtils {
         return sharedPref.getBoolean(context.getString(R.string.pref_auto_snooze_key), true);
     }
 
+    public static boolean isRepeatAlertToneEnabled(Context context){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPref.getBoolean(context.getString(R.string.pref_repeat_alert_tone_key), false);
+    }
+
     public static int getAlertDuration(Context context){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPref.getInt(context.getString(R.string.pref_alarm_duration_key),

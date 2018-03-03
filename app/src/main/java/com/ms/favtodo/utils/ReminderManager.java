@@ -59,10 +59,11 @@ public class ReminderManager {
         }
     }
 
+    // reschedule alarm after notification preference time change for task without time
+
     public static void rescheduleAlarm(Context context){
         TaskDbHelper dbHelper = new TaskDbHelper(context);
         Cursor c1 = dbHelper.fetchTasksWithoutDueTime();
-        int rescheduleTasks = 0;
         if(c1!=null) {
             if (c1.getCount() != 0 && c1.moveToFirst()) {
                 do {
@@ -71,7 +72,7 @@ public class ReminderManager {
                     int minute = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE));
 
                     if(!TaskOperation.isPassed(dateInMs,hour,minute)){
-                        rescheduleTasks++;
+
                         int rowId = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID));
 
                         Calendar mCalendar = Calendar.getInstance();
@@ -96,7 +97,7 @@ public class ReminderManager {
 
     public static void restartAlarms(Context context){
         TaskDbHelper dbHelper = new TaskDbHelper(context);
-        Cursor c1 = dbHelper.fetchCompletedTasks(0);
+        Cursor c1 = dbHelper.fetchInCompletedTasksWithDate();
 
         if(c1!=null) {
             if (c1.getCount() != 0 && c1.moveToFirst()) {
@@ -116,9 +117,15 @@ public class ReminderManager {
                         mCalendar.set(Calendar.YEAR, cal.get(Calendar.YEAR));
                         mCalendar.set(Calendar.MONTH, cal.get(Calendar.MONTH));
                         mCalendar.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
-                        mCalendar.set(Calendar.HOUR_OF_DAY, PreferenceUtils.getHour(context));
-                        mCalendar.set(Calendar.MINUTE, PreferenceUtils.getMinute(context));
 
+                        if(hour == -1){
+                            mCalendar.set(Calendar.HOUR_OF_DAY, PreferenceUtils.getHour(context));
+                            mCalendar.set(Calendar.MINUTE, PreferenceUtils.getMinute(context));
+                        }
+                        else{
+                            mCalendar.set(Calendar.HOUR_OF_DAY, hour);
+                            mCalendar.set(Calendar.MINUTE, minute);
+                        }
                         scheduleReminder(mCalendar,context,(long)rowId);
                     }
                 }

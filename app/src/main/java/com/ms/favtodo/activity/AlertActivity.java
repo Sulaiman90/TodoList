@@ -71,7 +71,6 @@ public class AlertActivity extends AppCompatActivity {
     private boolean mSnooze = true;
     private TaskDbHelper dbHelper;
     private PowerManager powerManager;
-    private WakeLock wakeLock;
 
     @BindView(R.id.iv_alert_silence) ImageView mIvSilence;
     @BindView(R.id.tv_alert_time) TextView mTvDateAndTime;
@@ -85,6 +84,8 @@ public class AlertActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Window window = this.getWindow();
+
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
         FrameLayout statusbar = findViewById(R.id.statusbar);
 
@@ -119,8 +120,6 @@ public class AlertActivity extends AppCompatActivity {
 
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
-        //wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakelockTag");
-
         start(getIntent());
     }
 
@@ -128,10 +127,6 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-       /* if(wakeLock!= null && !wakeLock.isHeld()){
-            Log.d(TAG,"wakeLock");
-            wakeLock.acquire();
-        }*/
     }
 
     @Override
@@ -150,6 +145,23 @@ public class AlertActivity extends AppCompatActivity {
             playSound = b.getBoolean(NewTask.PLAY_SOUND);
         }
         mSnooze = playSound;
+
+        boolean isScreenOn;
+
+        if(Build.VERSION.SDK_INT >= 20) {
+            isScreenOn = powerManager.isInteractive();
+        }
+        else{
+            isScreenOn = powerManager.isScreenOn();
+        }
+
+        if(!isScreenOn){
+            addNotification();
+            return;
+           /* WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP, "MyWakelockTag");
+            wakeLock.acquire(100);*/
+        }
 
         //Log.d(TAG, " taskId "+taskId + " mSnooze "+mSnooze);
 
@@ -238,9 +250,6 @@ public class AlertActivity extends AppCompatActivity {
     public void snoozeTask() {
         showNotification = false;
         mSnooze = true;
-        ContentValues cv = new ContentValues();
-        cv.put(TaskContract.TaskEntry.SNOOZE_ON , 1);
-        dbHelper.updateTask((int)taskId, cv);
         snoozeAlarm();
         finish();
     }
@@ -276,11 +285,13 @@ public class AlertActivity extends AppCompatActivity {
 
         if(mMediaPlayer == null){
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setLooping(true);
+            if(PreferenceUtils.isRepeatAlertToneEnabled(this)){
+                mMediaPlayer.setLooping(true);
+            }
             mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    Log.d(TAG, "onPrepared");
+                   // Log.d(TAG, "onPrepared");
                     mp.start();
                 }
             });
@@ -333,10 +344,6 @@ public class AlertActivity extends AppCompatActivity {
         else {
             ReminderManager.cancelNotification(this, taskId);
         }
-       /* if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-            wakeLock = null;
-        }*/
     }
 
     @Override

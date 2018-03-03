@@ -53,17 +53,14 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Cursor fetchCompletedTasks(int doneOrNot){
-        // 0 -- not completed , 1 -- completed
-        String[] columns = new String[] { TaskEntry.TASK_ID, TaskEntry.TASK_TITLE, TaskEntry.TASK_DATE,
-                                         TaskEntry.TASK_TIME,TaskEntry.TASK_DATE_AND_TIME , TaskEntry.TASK_DONE,
-                                         TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
+    public Cursor fetchCompletedTasks(){
         Cursor cursor = this.getReadableDatabase().query(
-                    TaskEntry.TABLE_NAME,
+                     TaskEntry.TABLE_NAME,
                     null,
                     TaskEntry.TASK_DONE + "=?",
-                    new String[] {String.valueOf(doneOrNot)},
-                    null,null,
+                     new String[] {String.valueOf(1)},
+                    null,
+                    null,
                     TaskEntry.TASK_DATE_IN_MS+" ASC",
                     null);
         if (cursor!=null){
@@ -72,10 +69,23 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor fetchInCompletedTasks(){
+        Cursor cursor = this.getReadableDatabase().query(
+                TaskEntry.TABLE_NAME,
+                null,
+                TaskEntry.TASK_DONE + "=?",
+                new String[] {String.valueOf(0)},
+                null,
+                null,
+                TaskEntry.TASK_ID+" DESC",
+                null);
+        if (cursor!=null){
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
     public Cursor fetchTask(long rowId){
-        String[] columns = new String[] { TaskEntry.TASK_ID, TaskEntry.TASK_TITLE, TaskEntry.TASK_DATE,
-                TaskEntry.TASK_TIME,TaskEntry.TASK_DATE_AND_TIME , TaskEntry.TASK_DONE,
-                TaskEntry.TASK_DATE_IN_MS , TaskEntry.TASK_HOUR ,TaskEntry.TASK_MINUTE };
         Cursor cursor = this.getReadableDatabase().query(
                 TaskEntry.TABLE_NAME,
                 null,
@@ -148,6 +158,26 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return repeat;
     }
 
+    // get incomplete tasks with dates set
+
+    public Cursor fetchInCompletedTasksWithDate(){
+        Cursor cursor = this.getReadableDatabase().query(
+                TaskEntry.TABLE_NAME,
+                null,
+                TaskEntry.TASK_DONE + "=?" + " AND " + TaskEntry.TASK_DATE + "!=?" ,
+                new String[] {String.valueOf(0),""},
+                null,
+                null,
+                TaskEntry.TASK_ID+" DESC",
+                null);
+        if (cursor!=null){
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
+    // get incomplete tasks without due time
+
     public Cursor fetchTasksWithoutDueTime(){
         String empty = "";
         Cursor cursor = this.getReadableDatabase().query(
@@ -166,6 +196,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
 
     public int updateTask(int taskId,ContentValues cv) {
         SQLiteDatabase db = this.getWritableDatabase();

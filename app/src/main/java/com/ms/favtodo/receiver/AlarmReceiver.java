@@ -40,21 +40,13 @@ public class AlarmReceiver extends BroadcastReceiver {
             Bundle b = intent.getExtras();
             Intent newIntent = new Intent(context, AlertActivity.class);
 
-            TaskDbHelper dbHelper = new TaskDbHelper(context);
-            boolean snoozeOn = true;
-
             if (b != null) {
                 b.putBoolean(NewTask.PLAY_SOUND, true);
                 newIntent.putExtras(b);
-                long taskId = b.getLong(NewTask.TASK_ID);
-                Cursor c1 =  dbHelper.fetchTask(taskId);
-                snoozeOn = c1.getInt(c1.getColumnIndexOrThrow(TaskEntry.SNOOZE_ON)) == 1;
             }
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //Log.d(TAG, "AlarmReceiver: snoozeOn "+snoozeOn);
-            if(snoozeOn){
-                context.startActivity(newIntent);
-            }
+            //Log.d(TAG, "AlarmReceiver: ");
+            context.startActivity(newIntent);
         }
     }
 }

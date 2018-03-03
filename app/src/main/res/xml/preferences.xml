@@ -3,6 +3,33 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:asp="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="@string/pref_title_sounds">
+
+        <SwitchPreference
+            android:key="@string/pref_enable_sound_key"
+            android:title="@string/pref_enable_sound_title"
+            android:defaultValue="false"
+            />
+
+        <RingtonePreference
+            android:defaultValue="content://settings/system/notification_sound"
+            android:key="@string/pref_notification_sound_key"
+            android:title="@string/pref_notification_sound_title"
+            android:ringtoneType="all"
+            android:summary="@string/pref_notification_sound_summary"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:dependency="@string/pref_enable_sound_key"
+            />
+
+        <CheckBoxPreference
+            android:key="@string/pref_repeat_alert_tone_key"
+            android:title="@string/pref_repeat_alert_tone_title"
+            android:defaultValue="false"
+            />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/pref_title_alert">
 
          <Preference
@@ -17,23 +44,6 @@
             android:summary="@string/pref_notification_vibrate_summary"
             android:defaultValue="false"
             />
-
-         <SwitchPreference
-             android:key="@string/pref_enable_sound_key"
-             android:title="@string/pref_enable_sound_title"
-             android:defaultValue="false"
-             />
-
-         <RingtonePreference
-             android:defaultValue="content://settings/system/notification_sound"
-             android:key="@string/pref_notification_sound_key"
-             android:title="@string/pref_notification_sound_title"
-             android:ringtoneType="all"
-             android:summary="@string/pref_notification_sound_summary"
-             android:showDefault="true"
-             android:showSilent="true"
-             android:dependency="@string/pref_enable_sound_key"
-             />
 
         <com.ms.favtodo.preference.SeekBarPreference
             android:key="@string/pref_alarm_duration_key"
