@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,13 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.ms.favtodo.R;
-import com.ms.favtodo.activity.AlertActivity;
-
 // Based on a Stack Overflow example: http://stackoverflow.com/questions/1974193/slider-on-my-preferencescreen
 public class SeekBarPreference extends DialogPreference
 {
-    private static final String TAG = AlertActivity.class.getSimpleName();
+    //private static final String TAG = SeekBarPreference.class.getSimpleName();
 
     private static final String SCHEMA_URL = "http://schemas.android.com/apk/res/android";
 

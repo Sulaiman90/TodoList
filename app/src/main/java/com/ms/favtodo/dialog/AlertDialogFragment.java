@@ -12,7 +12,7 @@ import com.ms.favtodo.R;
 
 public class AlertDialogFragment extends DialogFragment{
 
-    private static final String TAG = "AlertDialogFragment";
+    //private static final String TAG = AlertDialogFragment.class.getSimpleName();
 
     public static AlertDialogFragment newInstance() {
         return new AlertDialogFragment();

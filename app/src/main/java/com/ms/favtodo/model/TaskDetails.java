@@ -1,9 +1,5 @@
 package com.ms.favtodo.model;
 
-/**
- * Created by MOHAMED SULAIMAN on 05-01-2017.
- */
-
 public class TaskDetails {
 
     private String title="";

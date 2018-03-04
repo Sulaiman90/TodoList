@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.TodoList;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.sync.TaskReminderIntentService;
 import com.ms.favtodo.utils.TaskOperation;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TaskDbHelper dbHelper;
     private TaskOperation taskOperation;
 
-    private static final String TAG = "FavDo_Main";
+   // private static final String TAG = MainActivity.class.getSimpleName();
 
     private EditText quickTask;
     private ImageButton tickBtn;
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.action_bar_spinner_menu, menu);
 
         MenuItem item = menu.findItem(R.id.spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        Spinner spinner = (Spinner) item.getActionView();
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.spinner_list_items, android.R.layout.simple_spinner_item);
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hideDefaultKeyboard() {
-        TaskOperation.hideKeyboard(MainActivity.this);
+        TodoList.hideKeyboard(MainActivity.this);
     }
 
     private void hideShowFooterViews(Boolean hide){

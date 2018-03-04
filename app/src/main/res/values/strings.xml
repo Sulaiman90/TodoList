@@ -108,7 +108,7 @@
     <string name="no">No</string>
     <string name="ok">Yes</string>
 
-    <string name="repeat_dialog_message">Repeat Task</string>
+    <string name="repeat_dialog_message">Repeat Task ?</string>
     <string name="repeat_dialog_title">Repeat Task ?</string>
 
     <string name="tap_to_view">Tap here to view</string>

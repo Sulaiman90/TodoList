@@ -13,7 +13,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -23,7 +22,6 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -45,23 +43,24 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
+import com.ms.favtodo.TodoList;
 import com.ms.favtodo.db.TaskContract;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.dialog.AlertDialogFragment;
 import com.ms.favtodo.model.TaskDetails;
+import com.ms.favtodo.utils.DateUtility;
 import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.ReminderManager;
-import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.ms.favtodo.utils.TaskOperation.generateTime;
 
 public class NewTask extends AppCompatActivity {
 
@@ -76,11 +75,10 @@ public class NewTask extends AppCompatActivity {
     private static ImageButton mClearTime;
 
     private TaskDbHelper dbHelper;
-    private static TaskOperation taskOperation;
 
     private Boolean newTask = false;
 
-    private Toast toastobject;
+    private Toast toastObject;
 
     private DialogFragment mDialog;
 
@@ -96,7 +94,6 @@ public class NewTask extends AppCompatActivity {
 
     private static LinearLayout mTimeLayout;
     private String notificationSound = "";
-    private TaskDetails task;
 
     int mRepeatSpinnerValue = 0;
 
@@ -122,8 +119,7 @@ public class NewTask extends AppCompatActivity {
         timeText = "";
 
         dbHelper = new TaskDbHelper(this);
-        taskOperation = new TaskOperation(this);
-        task = new TaskDetails();
+        TaskDetails task = new TaskDetails();
         mCalendar = Calendar.getInstance();
 
         mTitleText =  findViewById(R.id.title);
@@ -164,9 +160,16 @@ public class NewTask extends AppCompatActivity {
             mVibrateSwitch.setChecked(PreferenceUtils.isVibrateEnabled(this));
         }
         else {
-            getSupportActionBar().setTitle("");
+            if(getSupportActionBar() != null){
+                getSupportActionBar().setTitle("");
+            }
             Bundle extras = getIntent().getExtras();
-            taskId  = extras.getInt(NewTask.TASK_ID);
+            if (extras != null) {
+                taskId  = extras.getInt(NewTask.TASK_ID);
+            }
+            else{
+                return;
+            }
 
             Cursor c1 =  dbHelper.fetchTask(taskId);
 
@@ -247,7 +250,7 @@ public class NewTask extends AppCompatActivity {
         mDateText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                TaskOperation.hideKeyboard(NewTask.this);
+                TodoList.hideKeyboard(NewTask.this);
                 showDatePickerDialog();
             }
         });
@@ -255,7 +258,7 @@ public class NewTask extends AppCompatActivity {
         mTimeText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                taskOperation.hideKeyboard(NewTask.this);
+                TodoList.hideKeyboard(NewTask.this);
                 showTimePickerDialog();
             }
         });
@@ -263,7 +266,7 @@ public class NewTask extends AppCompatActivity {
         mTaskDone.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                taskOperation.hideKeyboard(NewTask.this);
+                TodoList.hideKeyboard(NewTask.this);
                 String stringDone = getResources().getString(R.string.task_finished_excl);
                 String stringNotDone = getResources().getString(R.string.task_finished_ques);
                 if (mTaskDone.isChecked()) {
@@ -299,7 +302,7 @@ public class NewTask extends AppCompatActivity {
                 // mClearTime.setVisibility(View.GONE);
                 showHideButtons(mClearTime, false);
                 resetTimeText();
-                if(!taskOperation.isDatePassed(dateInMillis)){
+                if(!DateUtility.isDatePassed(dateInMillis)){
                     mDateText.setTextColor(ContextCompat.getColor(NewTask.this, R.color.black));
                 }
             }
@@ -408,7 +411,7 @@ public class NewTask extends AppCompatActivity {
 
             todoTime = mTimeText.getText().toString();
 
-            todoDateAndTime = TaskOperation.getDateAndTime(todoDate, todoTime);
+            todoDateAndTime = DateUtility.getDateAndTime(todoDate, todoTime);
 
             if (mTaskDone.isChecked()) {
                 todoFinished = 1;
@@ -495,27 +498,30 @@ public class NewTask extends AppCompatActivity {
         } else {
             Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
             // Vibrate for specific milliseconds
-            v.vibrate(100);
-            if(toastobject!= null){
-                toastobject.cancel();
+            if (v != null) {
+                v.vibrate(100);
             }
-            toastobject = Toast.makeText(getApplicationContext(), getResources().getString(R.string.task_alert), Toast.LENGTH_SHORT);
-            toastobject.show();
+            if(toastObject!= null){
+                toastObject.cancel();
+            }
+            toastObject = Toast.makeText(getApplicationContext(), getResources().getString(R.string.task_alert), Toast.LENGTH_SHORT);
+            toastObject.show();
         }
     }
 
     public void continueDelete(Boolean delete) {
         if(delete) {
-            String todoTitle = mTitleText.getText().toString();
             int deleteCount = dbHelper.deleteTask(taskId);
            // Log.i(TAG, "task deleted " + deleteCount);
-            if(toastobject!= null){
-                toastobject.cancel();
+            if(toastObject!= null){
+                toastObject.cancel();
             }
-            toastobject = Toast.makeText(getApplicationContext(),
-                    getResources().getString(R.string.task_deleted), Toast.LENGTH_SHORT);
-            toastobject.show();
-            ReminderManager.cancelReminderAndNotification(this,taskId);
+            if(deleteCount > 0){
+                toastObject = Toast.makeText(getApplicationContext(),
+                        getResources().getString(R.string.task_deleted), Toast.LENGTH_SHORT);
+                toastObject.show();
+                ReminderManager.cancelReminderAndNotification(this,taskId);
+            }
             exitActivity();
         }
         else{
@@ -551,14 +557,14 @@ public class NewTask extends AppCompatActivity {
     }
 
     public static void checkIfDatePassed(long date, String dateString) {
-        String result = taskOperation.checkDates(dateInMillis);
+        String result = DateUtility.checkDates(dateInMillis, mDateText.getContext());
         if (result.equals("")) {
             mDateText.setText(dateString);
         } else {
             mDateText.setText(result);
         }
         if(!mTaskDone.isChecked()) {
-            if (taskOperation.isDatePassed(date)) {
+            if (DateUtility.isDatePassed(date)) {
                // Log.d(TAG,"isDatePassed ");
                 mDateText.setTextColor(ContextCompat.getColor(mDateText.getContext(), R.color.red));
                 mTimeText.setTextColor(ContextCompat.getColor(mTimeText.getContext(), R.color.red));
@@ -572,7 +578,7 @@ public class NewTask extends AppCompatActivity {
     public static void checkIfTimePassed(int selectedHour, int selectedMinute) {
         if(!mTaskDone.isChecked() && DateUtils.isToday(dateInMillis)){
            // Log.d(TAG,"isTimePassed "+selectedHour +" "+selectedMinute);
-            if(taskOperation.isTimePassed(selectedHour,selectedMinute)){
+            if(DateUtility.isTimePassed(selectedHour,selectedMinute)){
                 mDateText.setTextColor(ContextCompat.getColor(mDateText.getContext(), R.color.red));
                 mTimeText.setTextColor(ContextCompat.getColor(mTimeText.getContext(), R.color.red));
             }
@@ -619,7 +625,7 @@ public class NewTask extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 exitActivity();
-            };
+            }
         });
 
         // 3. Get the AlertDialog from create()
@@ -653,7 +659,7 @@ public class NewTask extends AppCompatActivity {
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            int dayName = c.get(Calendar.DAY_OF_WEEK);
+           // int dayName = c.get(Calendar.DAY_OF_WEEK);
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -676,22 +682,19 @@ public class NewTask extends AppCompatActivity {
             cal.set(Calendar.MONTH, datePicker.getMonth());
             cal.set(Calendar.YEAR, datePicker.getYear());
 
-            SimpleDateFormat day_date = new SimpleDateFormat("EEE");
-            SimpleDateFormat month_date = new SimpleDateFormat("MMM");
+            SimpleDateFormat day_date = new SimpleDateFormat("EEE", Locale.US);
+            SimpleDateFormat month_date = new SimpleDateFormat("MMM", Locale.US);
             String dayName = day_date.format(cal.getTime());
             String monthName = month_date.format(cal.getTime());
            // Log.d(TAG,"month_name "+	monthName +" day_name "+dayName);
 
             //Log.d(TAG,"dateInMillis "+	dateInMillis+" "+ Calendar.getInstance().getTimeInMillis());
 
-           /* Log.d(TAG,"result "+result);
-            Log.d(TAG,"isPassed "+taskOperation.isPassed(dateInMillis));
-            Log.d(TAG,"checkIfNextWeek "+taskOperation.checkIfNextWeek(dateInMillis));
-            Log.d(TAG,"checkIfNextMonth "+taskOperation.checkIfNextMonth(dateInMillis));*/
+            //Log.d(TAG,"result "+result);
 
             dateInMillis = cal.getTimeInMillis();
 
-            dateText = TaskOperation.setDateString(selectedYear, monthName, selectedDay, dayName);
+            dateText = DateUtility.setDateString(selectedYear, monthName, selectedDay, dayName);
 
             checkIfDatePassed(dateInMillis,dateText);
 
@@ -702,9 +705,6 @@ public class NewTask extends AppCompatActivity {
 
         }
     }
-
-
-
 
     public static class TimePickerFragment extends DialogFragment implements OnTimeSetListener {
 
@@ -748,7 +748,7 @@ public class NewTask extends AppCompatActivity {
 
             dateInMillis = mCalendar.getTimeInMillis();
 
-            String timeString = TaskOperation.generateTime(selectedHour,selectedMinute);
+            String timeString = DateUtility.generateTime(selectedHour,selectedMinute);
             mTimeText.setText(timeString);
             timeText = timeString;
             showHideButtons(mClearTime, true);
@@ -759,34 +759,8 @@ public class NewTask extends AppCompatActivity {
            // Log.d(TAG,"timeString "+timeString);
 
           //  Log.d(TAG," selectedHour "+selectedHour + " selectedMinute "+selectedMinute);
-           // Log.d(TAG,"isPassed "+taskOperation.isPassed(dateInMillis));
 
             checkIfTimePassed(taskHour,taskMinute);
         }
     }
-
-    private static String setTimeString(int hourOfDay, int minute) {
-
-        String min = "" + minute;
-        String hour = "" + hourOfDay;
-
-        if (minute < 10)
-            min = "0" + minute;
-
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        c.set(Calendar.MINUTE, minute);
-
-        String amOrPm;
-        c = Calendar.getInstance();
-        int am_pm = c.get(Calendar.AM_PM);
-        if (am_pm == Calendar.AM) {
-            amOrPm = "AM";
-        } else {
-            amOrPm = "PM";
-        }
-        return hour + ":" + min + " " + amOrPm;
-    }
-
-
 }

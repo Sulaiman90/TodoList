@@ -1,46 +1,36 @@
 package com.ms.favtodo.activity;
 
-import android.annotation.TargetApi;
+
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
+
 import android.view.MenuItem;
 import android.widget.TimePicker;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.preference.SeekBarPreference;
 import com.ms.favtodo.utils.PreferenceUtils;
-import com.ms.favtodo.utils.TaskOperation;
 
-import java.util.List;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-    private static final String TAG = SettingsActivity.class.getSimpleName();
+    //private static final String TAG = SettingsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +171,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
 
                 int hour = selectedHour;
-                int minutes = selectedMinute;
+               // int minutes = selectedMinute;
 
                 String timeSet;
                 if (hour > 12) {
@@ -197,14 +187,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
                 String min;
-                if (minutes < 10)
-                    min = "0" + minutes ;
+                if (selectedMinute < 10)
+                    min = "0" + selectedMinute ;
                 else
-                    min = String.valueOf(minutes);
+                    min = String.valueOf(selectedMinute);
 
                 String timeString;
 
-                if(minutes!=0){
+                if(selectedMinute!=0){
                     timeString = hour +":"+min +" "+timeSet;
                 }
                 else{

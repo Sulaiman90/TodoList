@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -35,12 +34,11 @@ import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.receiver.PhoneStateReceiver;
 import com.ms.favtodo.sync.ReminderTasks;
 import com.ms.favtodo.sync.TaskReminderIntentService;
+import com.ms.favtodo.utils.DateUtility;
 import com.ms.favtodo.utils.NotificationUtils;
 import com.ms.favtodo.utils.PreferenceUtils;
 import com.ms.favtodo.utils.ReminderManager;
-import com.ms.favtodo.utils.TaskOperation;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,10 +55,8 @@ public class AlertActivity extends AppCompatActivity {
     private Vibrator mVibrator;
     private boolean mVibrate;
     private final long[] mVibratePattern = { 0, 500, 500 ,500, 500 };
-    private Button mDismissButton;
     private boolean mSoundOn = true;
     private Timer mTimer = null;
-    private PlayTimerTask mTimerTask;
     private long mPlayTime;
     private boolean showNotification = true;
     private long taskId;
@@ -68,7 +64,6 @@ public class AlertActivity extends AppCompatActivity {
     private TaskDbHelper dbHelper;
     private PowerManager powerManager;
     private LocalBroadcastManager mLocalBroadcastManager;
-    private String phoneState = "";
 
     public static final String PHONE_STATE_BROADCAST = "phone_state_broadcast";
 
@@ -104,7 +99,7 @@ public class AlertActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
-        mDismissButton = findViewById(R.id.btn_dismiss);
+        Button mDismissButton = findViewById(R.id.btn_dismiss);
 
         mDismissButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -257,7 +252,7 @@ public class AlertActivity extends AppCompatActivity {
             startPlayingSound(notificationSound);
         }
 
-        mTimerTask = new PlayTimerTask();
+        PlayTimerTask mTimerTask = new PlayTimerTask();
         mTimer = new Timer();
         mTimer.schedule(mTimerTask, mPlayTime);
     }
@@ -317,7 +312,7 @@ public class AlertActivity extends AppCompatActivity {
         int hour = when.get(Calendar.HOUR_OF_DAY);
         int minute = when.get(Calendar.MINUTE);
 
-        String timeString = TaskOperation.generateTime(hour,minute);
+        String timeString = DateUtility.generateTime(hour,minute);
 
        // Log.d(TAG, "hour "+hour +" minute "+minute);
         Toast.makeText(this, "Remind you again at " + timeString,Toast.LENGTH_SHORT).show();

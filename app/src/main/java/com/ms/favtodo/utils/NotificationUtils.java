@@ -9,24 +9,18 @@ import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.ms.favtodo.R;
 import com.ms.favtodo.activity.AlertActivity;
 import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
-import com.ms.favtodo.model.TaskDetails;
-import com.ms.favtodo.sync.ReminderTasks;
-import com.ms.favtodo.sync.TaskReminderIntentService;
 
 public class NotificationUtils {
-    private static final String TAG = NotificationUtils.class.getSimpleName();
+
+    //private static final String TAG = NotificationUtils.class.getSimpleName();
 
     public static void createNotification(Context context,long rowId){
        // Log.d(TAG,"createNotification "+alarmSound);
@@ -57,7 +51,9 @@ public class NotificationUtils {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         /*  NOTIFICATION_ID allows you to update or cancel the notification later on */
-        notificationManager.notify((int)rowId, notification);
+        if (notificationManager != null) {
+            notificationManager.notify((int)rowId, notification);
+        }
     }
 
     private static PendingIntent contentIntent(Context context, long rowId) {
@@ -76,7 +72,7 @@ public class NotificationUtils {
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private static Action taskCompletedAction(Context context, long rowID){
+   /* private static Action taskCompletedAction(Context context, long rowID){
         Intent launchIntent = new Intent(context, TaskReminderIntentService.class);
         launchIntent.setAction(ReminderTasks.ACTION_TASK_COMPLETED);
         launchIntent.putExtra("taskRowId",rowID);
@@ -103,9 +99,9 @@ public class NotificationUtils {
                 context.getResources().getString(R.string.ignore_remainder),
                 pendingIntent);
         return ignoreReminderAction;
-    }
+    }*/
 
-    public static Uri getDefaultNotificationSound(){
+    static Uri getDefaultNotificationSound(){
         Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if(notificationSound == null){
             notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

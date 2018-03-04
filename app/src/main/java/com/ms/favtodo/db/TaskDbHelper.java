@@ -5,11 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
 import com.ms.favtodo.db.TaskContract.TaskEntry;
-import com.ms.favtodo.model.TaskDetails;
-import com.ms.favtodo.utils.ReminderManager;
+import com.ms.favtodo.utils.DateUtility;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.text.SimpleDateFormat;
@@ -19,9 +16,7 @@ import java.util.Locale;
 
 public class TaskDbHelper extends SQLiteOpenHelper {
 
-    private Context mContext;
-
-    private static final String TAG = "FavDo_TaskDbHelper";
+   // private static final String TAG = TaskDbHelper.class.getSimpleName();
 
     public TaskDbHelper(Context context){
         super(context, TaskContract.DATABASE_NAME, null, TaskContract.DATABASE_VERSION);
@@ -145,8 +140,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         int year = repeat.get(Calendar.YEAR);
         int day =  repeat.get(Calendar.DAY_OF_MONTH);
 
-        String date = TaskOperation.setDateString(year, monthName, day, dayName);
-        String dateAndTime = TaskOperation.getDateAndTime(date, time);
+        String date = DateUtility.setDateString(year, monthName, day, dayName);
+        String dateAndTime = DateUtility.getDateAndTime(date, time);
 
         ContentValues cv = new ContentValues();
         cv.put(TaskEntry.TASK_DONE, 0);
@@ -154,7 +149,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         cv.put(TaskEntry.TASK_DATE, date);
         cv.put(TaskEntry.TASK_DATE_AND_TIME, dateAndTime);
 
-        int rowsUpdated = updateTask(taskId, cv);
+        updateTask(taskId, cv);
 
         return repeat;
     }

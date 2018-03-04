@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
-import android.widget.Toast;
 
 import com.ms.favtodo.activity.AlertActivity;
 
@@ -31,12 +30,12 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     //Toast.makeText(context,"Ringing State ",Toast.LENGTH_SHORT).show();
                     mLocalBroadcastManager.sendBroadcast(alertActivityIntent);
                 }
-                if ((state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK))){
-                    Toast.makeText(context,"Received State",Toast.LENGTH_SHORT).show();
+                /*if ((state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK))){
+                    //Toast.makeText(context,"Received State",Toast.LENGTH_SHORT).show();
                 }
                 if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)){
-                    Toast.makeText(context,"Idle State",Toast.LENGTH_SHORT).show();
-                }
+                    //Toast.makeText(context,"Idle State",Toast.LENGTH_SHORT).show();
+                }*/
             }
         }
     }

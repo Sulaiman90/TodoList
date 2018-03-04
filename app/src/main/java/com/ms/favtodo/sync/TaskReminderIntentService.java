@@ -10,7 +10,7 @@ import com.ms.favtodo.activity.NewTask;
 
 public class TaskReminderIntentService extends IntentService {
 
-    private static final String TAG = "FavDo_TaskReminder";
+    //private static final String TAG = TaskReminderIntentService.class.getSimpleName();
 
     public static final String SERVICE_RESULT = "com.service.result";
     public static final String SERVICE_MESSAGE = "com.service.message";

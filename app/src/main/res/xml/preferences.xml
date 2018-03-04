@@ -59,7 +59,7 @@
             android:key="@string/pref_auto_snooze_key"
             android:summary="@string/pref_auto_snooze_summary"
             android:title="@string/pref_auto_snooze_title"
-            android:defaultValue="true"
+            android:defaultValue="false"
             />
 
        <com.ms.favtodo.preference.SeekBarPreference

@@ -1,23 +1,18 @@
 package com.ms.favtodo.utils;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.text.TextUtils;
+
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ms.favtodo.activity.MainActivity;
 import com.ms.favtodo.activity.NewTask;
@@ -29,14 +24,15 @@ import com.ms.favtodo.model.TaskDetails;
 
 
 import java.util.ArrayList;
-import java.util.Calendar;
+
+import static com.ms.favtodo.utils.DateUtility.isTomorrow;
 
 public class TaskOperation {
 
     private TaskDbHelper dbHelper;
     private Context mContext;
 
-    private static final String TAG = "FavDo_TaskOperation";
+   // private static final String TAG = TaskOperation.class.getSimpleName();
 
     public TaskOperation(Context context){
         mContext = context;
@@ -113,7 +109,7 @@ public class TaskOperation {
                     if(date==0){
                         noDateTasks.add(task);
                     }
-                    else if(isPassed(date,task.getTaskHour(),task.getTaskMinute())){
+                    else if(DateUtility.isPassed(date,task.getTaskHour(),task.getTaskMinute())){
                        // Log.d(TAG,"isToday "+c1.getString(c1.getColumnIndexOrThrow(TaskEntry.TASK_TITLE)));
                        // Log.d(TAG,"isPassed:title "+task.getTitle() + " hour "+task.getTaskHour() + " minute "+task.getTaskMinute());
                         overdueTasks.add(task);
@@ -125,19 +121,19 @@ public class TaskOperation {
                     else if(isTomorrow(date)){
                         tomorrowTasks.add(task);
                     }
-                    else if(checkIfThisWeek(date)){
+                    else if(DateUtility.checkIfThisWeek(date)){
                         thisWeekTasks.add(task);
                     }
-                    else if(checkIfNextWeek(date)){
+                    else if(DateUtility.checkIfNextWeek(date)){
                         nextWeekTasks.add(task);
                     }
-                    else if(checkIfThisMonth(date)){
+                    else if(DateUtility.checkIfThisMonth(date)){
                         thisMonthTasks.add(task);
                     }
-                    else if(checkIfNextMonth(date)){
+                    else if(DateUtility.checkIfNextMonth(date)){
                         nextMonthTasks.add(task);
                     }
-                    else if(checkIfLater(date)){
+                    else if(DateUtility.checkIfLater(date)){
                         laterTasks.add(task);
                     }
                 }
@@ -221,8 +217,8 @@ public class TaskOperation {
     }
 
     private void setInfoText(Boolean completedTasksOnly){
-        TextView noFinishedTasks = (TextView) ((Activity)mContext).findViewById(R.id.no_tasks);
-        LinearLayout mEmptyLayout = (LinearLayout) ((Activity)mContext).findViewById(R.id.toDoEmptyView);
+        TextView noFinishedTasks = ((Activity)mContext).findViewById(R.id.no_tasks);
+        LinearLayout mEmptyLayout = ((Activity)mContext).findViewById(R.id.toDoEmptyView);
         if(completedTasksOnly){
             noFinishedTasks.setVisibility(View.VISIBLE);
             mEmptyLayout.setVisibility(View.GONE);
@@ -231,242 +227,6 @@ public class TaskOperation {
             mEmptyLayout.setVisibility(View.VISIBLE);
             noFinishedTasks.setVisibility(View.GONE);
         }
-    }
-
-    public String checkDates(long date){
-        String dateStr = "";
-        if(DateUtils.isToday(date)){
-            dateStr = mContext.getResources().getString(R.string.today);
-        }
-        else if(isTomorrow(date)){
-            dateStr = mContext.getResources().getString(R.string.tomorrow);
-        }
-        else if(isYesterday(date)){
-            dateStr = mContext.getResources().getString(R.string.yesterday);
-        }
-        return dateStr;
-    }
-
-    public static boolean isPassed(long date,int hour,int minute) {
-        if(DateUtils.isToday(date) && hour>=0 && minute>=0){
-            return isTimePassed(hour,minute);
-        }
-        else if(!DateUtils.isToday(date)){
-            Calendar now = Calendar.getInstance();
-            Calendar cdate = Calendar.getInstance();
-            cdate.setTimeInMillis(date);
-            return cdate.before(now);
-        }
-        return false;
-    }
-
-    public static boolean isDatePassed(long date) {
-        if(!DateUtils.isToday(date)){
-            Calendar now = Calendar.getInstance();
-            Calendar cdate = Calendar.getInstance();
-            cdate.setTimeInMillis(date);
-            return cdate.before(now);
-        }
-        return false;
-    }
-
-    public static boolean isTimePassed(int hour,int minute){
-        Calendar now = Calendar.getInstance();
-        int currentHour = now.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = now.get(Calendar.MINUTE);
-        if(hour>=0 && minute>=0){
-            if(hour < currentHour){
-                return true;
-            }
-            else if(hour == currentHour){
-                if(minute <= currentMinute){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private static boolean isYesterday(long date) {
-        Calendar now = Calendar.getInstance();
-        Calendar cdate = Calendar.getInstance();
-        cdate.setTimeInMillis(date);
-
-        now.add(Calendar.DATE,-1);
-
-        return now.get(Calendar.YEAR) == cdate.get(Calendar.YEAR)
-                && now.get(Calendar.MONTH) == cdate.get(Calendar.MONTH)
-                && now.get(Calendar.DATE) == cdate.get(Calendar.DATE);
-    }
-
-    private static boolean isTomorrow(long date) {
-        Calendar now = Calendar.getInstance();
-        Calendar cdate = Calendar.getInstance();
-        cdate.setTimeInMillis(date);
-
-        now.add(Calendar.DATE,1);
-
-        return now.get(Calendar.YEAR) == cdate.get(Calendar.YEAR)
-                && now.get(Calendar.MONTH) == cdate.get(Calendar.MONTH)
-                && now.get(Calendar.DATE) == cdate.get(Calendar.DATE);
-    }
-
-    private static boolean checkIfThisWeek(long date){
-        Calendar cal1 = Calendar.getInstance();
-        cal1.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        int year1 = cal1.get(Calendar.YEAR);
-        int week1 = cal1.get(Calendar.WEEK_OF_YEAR);
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis(date);
-        cal2.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        int year2 = cal2.get(Calendar.YEAR);
-        int week2 = cal2.get(Calendar.WEEK_OF_YEAR);
-
-        if((year1 == year2) && (week2 == week1)){
-           // Log.d(TAG,"This week ");
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean checkIfNextWeek(long date){
-        Calendar cal1 = Calendar.getInstance();
-        cal1.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        int year1 = cal1.get(Calendar.YEAR);
-        int week1 = cal1.get(Calendar.WEEK_OF_YEAR);
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis(date);
-        cal2.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        int year2 = cal2.get(Calendar.YEAR);
-        int week2 = cal2.get(Calendar.WEEK_OF_YEAR);
-
-        if(year1 == year2 && (week2 > week1) && (week2-week1 == 1)){
-          // Log.d(TAG,"Next week ");
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean checkIfThisMonth(long date){
-        Calendar cal1 = Calendar.getInstance();
-        int year1 = cal1.get(Calendar.YEAR);
-        int month1 = cal1.get(Calendar.MONTH) +1 ;
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis(date);
-        int year2 = cal2.get(Calendar.YEAR);
-        int month2 = cal2.get(Calendar.MONTH) + 1;
-
-        if(year1 == year2 && (month2 == month1)){
-           // Log.d(TAG,"This month ");
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean checkIfNextMonth(long date){
-        Calendar cal1 = Calendar.getInstance();
-        int year1 = cal1.get(Calendar.YEAR);
-        int month1 = cal1.get(Calendar.MONTH) +1 ;
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis(date);
-        int year2 = cal2.get(Calendar.YEAR);
-        int month2 = cal2.get(Calendar.MONTH) + 1;
-
-       // Log.d(TAG,"Next month "+week1 +" "+week2);
-        if(year1 == year2 && (month2 > month1) && (month2-month1) == 1){
-            //Log.d(TAG,"Next month ");
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean checkIfLater(long date){
-        Calendar cal1 = Calendar.getInstance();
-        int year1 = cal1.get(Calendar.YEAR);
-        int month1 = cal1.get(Calendar.MONTH) +1 ;
-
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis(date);
-        int year2 = cal2.get(Calendar.YEAR);
-        int month2 = cal2.get(Calendar.MONTH) + 1;
-
-        // Log.d(TAG,"Next month "+year2 +" "+year1);
-        if(year2 > year1){
-            //Log.d(TAG,"After this current Year ");
-            return true;
-        }
-        else  if(year1 == year2 && (month2 > month1) && (month2-month1) > 1){
-           // Log.d(TAG,"After next month ");
-            return true;
-        }
-        return false;
-    }
-
-    public static String setDateString(int year, String monthOfYear, int dayOfMonth, String dayName) {
-
-        // Increment monthOfYear for Calendar/Date -> Time Format setting
-        String mon = "" + monthOfYear;
-        String day = "" + dayOfMonth;
-
-        if (dayOfMonth < 10)
-            day = "0" + dayOfMonth;
-
-        return dayName + ", " + mon + " " + day + ", " + year;
-    }
-
-    public static String getDateAndTime(String todoDate, String todoTime){
-        String todoDateAndTime;
-        if (!TextUtils.isEmpty(todoTime)) {
-            todoDateAndTime = todoDate + ", " + todoTime;
-        } else {
-            todoDateAndTime = todoDate;
-        }
-        return todoDateAndTime;
-    }
-
-    public static void hideKeyboard(@NonNull Activity activity) {
-        // Check if no view has focus:
-        View view = activity.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (inputManager != null) {
-                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        }
-    }
-
-    public static String generateTime(int selectedHour, int selectedMinute){
-        int hour = selectedHour;
-        String timeSet;
-        if (hour > 12) {
-            hour -= 12;
-            timeSet = "PM";
-        } else if (hour == 0) {
-            hour += 12;
-            timeSet = "AM";
-        } else if (hour == 12){
-            timeSet = "PM";
-        }else{
-            timeSet = "AM";
-        }
-
-        String min;
-        if (selectedMinute < 10)
-            min = "0" + selectedMinute ;
-        else
-            min = String.valueOf(selectedMinute);
-
-        String timeString = hour +":"+min +" "+timeSet;
-        return timeString;
-    }
-
-
-    public static void showDebugToast(Context context,String msg){
-        // Toast.makeText(context,msg,Toast.LENGTH_LONG).show();
     }
 
 }

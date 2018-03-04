@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
@@ -17,7 +16,7 @@ import java.util.Calendar;
 
 public class ReminderManager {
 
-    private static final String TAG = "ReminderManager";
+    //private static final String TAG = "ReminderManager";
 
     public static void scheduleReminder(Calendar when, Context context, long taskId){
 
@@ -71,7 +70,7 @@ public class ReminderManager {
                     int hour = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR));
                     int minute = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE));
 
-                    if(!TaskOperation.isPassed(dateInMs,hour,minute)){
+                    if(!DateUtility.isPassed(dateInMs,hour,minute)){
 
                         int rowId = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID));
 
@@ -108,7 +107,7 @@ public class ReminderManager {
                     int hour = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_HOUR));
                     int minute = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_MINUTE));
 
-                    if(!TaskOperation.isPassed(dateInMs,hour,minute)){
+                    if(!DateUtility.isPassed(dateInMs,hour,minute)){
                         int rowId = c1.getInt(c1.getColumnIndex(TaskEntry.TASK_ID));
 
                         Calendar mCalendar = Calendar.getInstance();

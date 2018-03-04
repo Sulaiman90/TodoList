@@ -21,16 +21,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ms.favtodo.R;
-import com.ms.favtodo.activity.NewTask;
 import com.ms.favtodo.db.TaskContract.TaskEntry;
 import com.ms.favtodo.db.TaskDbHelper;
 import com.ms.favtodo.model.TaskDetails;
+import com.ms.favtodo.utils.DateUtility;
 import com.ms.favtodo.utils.ReminderManager;
 import com.ms.favtodo.utils.TaskOperation;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.TreeSet;
 
 public class CustomListAdapter extends BaseAdapter{
 
@@ -53,7 +52,7 @@ public class CustomListAdapter extends BaseAdapter{
     private String toastMsg;
     private View mListRow;
 
-    private static final String TAG = "CustomListAdapter";
+//    private static final String TAG = CustomListAdapter.class.getSimpleName();
 
 
     public CustomListAdapter(Context context, ArrayList<TaskDetails> list,Boolean completedOnly){
@@ -65,12 +64,6 @@ public class CustomListAdapter extends BaseAdapter{
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public CustomListAdapter(Context context,Boolean completedOnly){
-        mContext = context;
-        dbHelper = new TaskDbHelper(context);
-        taskOperation = new TaskOperation(context);
-        completedTasksOnly = completedOnly;
-    }
 
     @Override
     public int getViewTypeCount() {
@@ -126,7 +119,9 @@ public class CustomListAdapter extends BaseAdapter{
                     viewHolder.tvHeader =  convertView.findViewById(R.id.section_title);
                     break;
             }
-            convertView.setTag(viewHolder);
+            if (convertView != null) {
+                convertView.setTag(viewHolder);
+            }
         }
         else{
           //  Log.d(TAG,"Else block: type "+type +" "+position);
@@ -138,17 +133,15 @@ public class CustomListAdapter extends BaseAdapter{
 
 
         if(type == TYPE_TASK) {
-
             try {
                // Log.d(TAG,"if type "+type +" "+position);
-
                 viewHolder.tvTitle.setText(taskDetails.getTitle());
                 String dateAndTime = taskDetails.getDateAndTime();
                 String time = taskDetails.getTime();
 
                 long dateInMilliSeconds = taskDetails.getDateInMilliSeconds();
 
-                String result = taskOperation.checkDates(dateInMilliSeconds);
+                String result = DateUtility.checkDates(dateInMilliSeconds, mContext);
 
                 if(taskDetails.getRepeatValue() != 0){
                     viewHolder.ivRepeat.setVisibility(View.VISIBLE);
@@ -185,7 +178,7 @@ public class CustomListAdapter extends BaseAdapter{
                     viewHolder.checkBox.setChecked(false);
                     viewHolder.tvTitle.setTextColor(ContextCompat.getColor(mContext, R.color.black));
                     if(!TextUtils.isEmpty(viewHolder.tvdateTime.getText())){
-                        if(TaskOperation.isPassed(dateInMilliSeconds,taskDetails.getTaskHour(),taskDetails.getTaskMinute())){
+                        if(DateUtility.isPassed(dateInMilliSeconds,taskDetails.getTaskHour(),taskDetails.getTaskMinute())){
                             // Log.d(TAG,"iff");
                             viewHolder.tvdateTime.setTextColor(ContextCompat.getColor(mContext, R.color.red));
                         }
@@ -270,7 +263,7 @@ public class CustomListAdapter extends BaseAdapter{
 
     }
 
-    public void showRepeatAlertDialog(final int taskId, final int repeatSpinnerValue, final int position){
+    private void showRepeatAlertDialog(final int taskId, final int repeatSpinnerValue, final int position){
         // 1. Instantiate an AlertDialog.Builder with its constructor
         AlertDialog.Builder builder = new Builder(mContext);
 
@@ -295,7 +288,7 @@ public class CustomListAdapter extends BaseAdapter{
                 dbHelper.updateTask(taskDetails.getTaskId(), values);
                 ReminderManager.cancelReminderAndNotification(mContext,taskDetails.getTaskId());
                 slideListItem(position);
-            };
+            }
         });
 
         // 3. Get the AlertDialog from create()
