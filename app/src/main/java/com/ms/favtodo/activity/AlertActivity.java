@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -139,7 +140,7 @@ public class AlertActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
+        //Log.d(TAG, "onDestroy "+mSnooze +" showNotification "+showNotification);
         mLocalBroadcastManager.unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
         cleanup();
@@ -171,7 +172,7 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     private void start(Intent intent){
-        Log.d(TAG, " start ");
+       // Log.d(TAG, " start ");
 
         Bundle b = intent.getExtras();
         boolean playSound = false;
@@ -203,9 +204,6 @@ public class AlertActivity extends AppCompatActivity {
         if(!isScreenOn){
             addNotification();
             return;
-           /* WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK |
-                    PowerManager.ACQUIRE_CAUSES_WAKEUP, "MyWakelockTag");
-            wakeLock.acquire(100);*/
         }
 
         //Log.d(TAG, " taskId "+taskId + " mSnooze "+mSnooze);
@@ -326,6 +324,12 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     private void startPlayingSound(String uriString){
+        AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+
+        if((audioManager != null ? audioManager.getRingerMode() : 0) == AudioManager.RINGER_MODE_SILENT){
+            return;
+        }
+
         Uri soundUri = Uri.parse(uriString);
 
         if(mMediaPlayer == null){

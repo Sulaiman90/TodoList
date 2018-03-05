@@ -36,6 +36,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -93,6 +94,8 @@ public class NewTask extends AppCompatActivity {
     private static Calendar mCalendar;
 
     private static LinearLayout mTimeLayout;
+    private static LinearLayout mRepeatLayout;
+    private static RelativeLayout mAlertSoundLayout;
     private String notificationSound = "";
 
     int mRepeatSpinnerValue = 0;
@@ -100,12 +103,13 @@ public class NewTask extends AppCompatActivity {
     public static String TASK_ID = "taskId";
     public static String PLAY_SOUND = "playSound";
 
+
+
     @BindView(R.id.enableVibrate_switch) Switch mVibrateSwitch;
     @BindView(R.id.enableSound_cb) CheckBox mSoundCheckBox;
     @BindView(R.id.choose_alarm_sound) Button mChooseSoundButton;
-    private static LinearLayout mRepeatLayout;
-    @BindView(R.id.spinner_repeat)
-    Spinner mRepeatSpinner;
+
+    @BindView(R.id.spinner_repeat) Spinner mRepeatSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +137,7 @@ public class NewTask extends AppCompatActivity {
 
         mTimeLayout = findViewById(R.id.timeLinearLayout);
         mRepeatLayout = findViewById(R.id.layout_repeat);
+        mAlertSoundLayout = findViewById(R.id.rl_sound_alert);
 
         LinearLayout linearLayout = findViewById(R.id.mark_as_done);
 
@@ -153,6 +158,7 @@ public class NewTask extends AppCompatActivity {
         if (newTask) {
             linearLayout.setVisibility(View.GONE);
             mTimeLayout.setVisibility(View.GONE);
+            mAlertSoundLayout.setVisibility(View.GONE);
             taskHour = -1;
             taskMinute = -1;
             notificationSound = PreferenceUtils.getNotificationSound(this);
@@ -216,9 +222,11 @@ public class NewTask extends AppCompatActivity {
             if (dateText.matches("")) {
                 showHideButtons(mClearDate, false);
                 mTimeLayout.setVisibility(View.GONE);
+                mAlertSoundLayout.setVisibility(View.GONE);
             }
             else {
                 mRepeatLayout.setVisibility(View.VISIBLE);
+                mAlertSoundLayout.setVisibility(View.VISIBLE);
                 showHideButtons(mClearDate, true);
                 checkIfDatePassed(dateInMillis,dateText);
                 mTimeText.setVisibility(View.VISIBLE);
@@ -291,6 +299,8 @@ public class NewTask extends AppCompatActivity {
                 showHideButtons(mClearTime, false);
                 mTimeLayout.setVisibility(View.GONE);
                 mRepeatLayout.setVisibility(View.GONE);
+                mAlertSoundLayout.setVisibility(View.GONE);
+                mRepeatSpinner.setSelection(0);
                 resetTexts();
                 resetTextColors();
             }
@@ -430,8 +440,6 @@ public class NewTask extends AppCompatActivity {
                 soundEnabled = 1;
             }
 
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
             ContentValues contentValues = new ContentValues();
 
             contentValues.put(TaskEntry.TASK_TITLE, todoTitle);
@@ -489,8 +497,9 @@ public class NewTask extends AppCompatActivity {
                     }
                 }
             }
-
-            db.close();
+            else if(!newTask && dateText.matches("")){
+                ReminderManager.cancelReminderAndNotification(this,taskId);
+            }
 
             if(!showRepeatTaskAlert){
                 exitActivity();
@@ -701,6 +710,7 @@ public class NewTask extends AppCompatActivity {
             mTimeLayout.setVisibility(View.VISIBLE);
             mTimeText.setVisibility(View.VISIBLE);
             mRepeatLayout.setVisibility(View.VISIBLE);
+            mAlertSoundLayout.setVisibility(View.VISIBLE);
             showHideButtons(mClearDate, true);
 
         }
